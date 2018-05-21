@@ -1,0 +1,32 @@
+{
+  "name": "data-cube-html",
+  "version": "0.1.0",
+  "description": "DataCube HTML methods.",
+  "main": "dist/html.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gjmcn/data-cube-html.git"
+  },
+  "author": "Graham McNeill",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gjmcn/data-cube-html/issues"
+  },
+  "homepage": "https://github.com/gjmcn/data-cube-html#readme",
+  "dependencies": {
+    "data-cube-helper": "^0.1.0"
+  },
+  "devDependencies": {
+    "rollup": "^0.59.1",
+    "rollup-plugin-commonjs": "^9.1.0",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-uglify": "^3.0.0"
+  },
+  "peerDependencies": {
+    "data-cube": "^0.1.0"
+  }
+}

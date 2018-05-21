@@ -1,2 +1,1 @@
-# data-cube-html
-DataCube HTML methods
+DataCube HTML methods.
