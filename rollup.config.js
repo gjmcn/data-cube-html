@@ -8,7 +8,7 @@ export default {
     extend: true,
     file: 'dist/html.js',
     format: 'umd',
-    name: 'qb'
+    name: 'qa'
   },
   plugins: [
     commonjs({

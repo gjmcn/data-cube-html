@@ -9,60 +9,71 @@
 
   //--------------- query ---------------//
   
-  //str[, elmt] -> array
-  const query = (q, parent) => {
-    q = q.assert.single(q);
-    parent = assert.single(parent);
-    if (parent === undefined || parent === null) {
-      return [...document.querySelectorAll(q)];
+  //str -> array
+  const qa = q => [...document.querySelectorAll(assert.single(q))];
+  
+  //str -> array
+  addArrayMethod('qa', function(q) {
+    assert.single(q);
+    const n = this.length;
+    const z = [];
+    let nz = 0;
+    let j = 0;
+    for (let i=0; i<n; i++) {
+      let sel = this[i].querySelectorAll(q);
+      let ns = sel.length;
+      nz += ns;
+      z.length = nz;
+      for (let k=0; k<ns; k++) {
+        z[j++] = sel[k];
+      }
     }
-    else return [...parent.querySelectorAll(q)];
-  };
+    return z;
+  });
   
   
   //--------------- append/prepend ---------------//
   
-  ??DO WE WANT TO ALLOW PASSING A FUNCTION INSTEAD OF A STRING?
-    -must return a single elmt? - if allow multiple elmts (func returns a noedlist)
-      handling the returned elmts conistently is trickier 
-    
-  THEN CHECK BELOW
-  
   {
-    //array/cube, *, bool, bool -> array
-    const append = (x, elm, retNew, pre) => {  
-      retNew = def(assert.single(retNew), true);
+    //array/cube, *, bool, * -> array
+    const insert = (x, elm, retOrig, posn) => {  
+      retOrig = assert.single(retOrig);
       const n = x.length;
       var [elm, elmSingle] = polarize(elm);
-      let newElm;
-      if (retNew) = newArray(np);
-      if (elmSingle) {
-        if (elm.length !== n) throw Error('shape mismatch');
-        if (typeof elm !== 'string' && np !== 1) {
+      var [posn, posnSingle] = polarize(posn);      
+      if (posnSingle && (posn === undefined || posn === null)) posn = 'end';
+      const checkArg = (arg, argSingle, n) => {
+        if ((!argSingle && arg.length !== n) || 
+            (argSingle && typeof arg !== 'string' && n !== 1)) {
           throw Error('shape mismatch');
-        } 
-      } 
-      for (let i=0; i<np; i++) {
+        }
+      };
+      checkArg(elm, elmSingle, n);
+      checkArg(posn, posnSingle, n);
+      if (!retOrig) var newElm = new Array(n);
+      for (let i=0; i<n; i++) {
         let elm_i = elmSingle ? elm : elm[i];
         if (typeof elm_i === 'string') elm_i = document.createElement(elm_i);
-        pre ?
-          x[i].insertBefore(elm_i, x[0].firstChild) :
-          x[i].appendChild(elm_i);
-        if (retNew) newElm[i] = elm_i;
+        let posn_i = posnSingle ? posn : posn[i];
+        if (posn_i === 'end') x[i].appendChild(elm_i);
+        else if (posn_i === 'start') x[i].insertBefore(elm_i, x[i].firstChild);
+        else x[i].insertBefore(elm_i, posn_i);
+        if (!retOrig) newElm[i] = elm_i;
       }
-      return retNew ? newElm : x;
+      return retOrig ? x : newElm;
     };
 
-    //* -> array   
-    addArrayMethod('prepend', function(elm, retNew) {
-      return append(this, elm, retNew, true);
+    addArrayMethod('insert', function(elm, retOrig, posn) {
+      return insert(this, elm, retOrig, posn);
     });
-    addArrayMethod('append', function(elm, retNew) {
-      return append(this, elm, retNew);
-    });
-  
+      
   }
   
+    
+    //JOINING TO DATA - IE ORDER - OR JUST AATTACH DATA
+    
+  //future, could allow passing function as elm - as d3 append does
+  // -just odd since natural to create arrays indata cube, not individual elements
   
   //should be no danger of mistakenly thinking ndeList an array since cube methods are 
   //array methods, cannot call them from nodeList
@@ -87,13 +98,15 @@
   //lastChild   myNodes.lastChild(),  last child of each node
   
   
+  //wrapper for insert adjacent HTML - so do not have to overwrite
+  //but nice for adding text?
+  
   //create element   shape.elm('div',5)
   //                   .$style('width' [10,20,30,40,50])
   //                   .put('p')
   
-  //put shold allow adding array of elmts, fragment?
-  //use frag to add multiple? - rather than having put and putAll?
 
+  module.exports = qa;
 
 }
   
