@@ -6,6 +6,10 @@
     assert, addArrayMethod, polarize, toArray, def
   } = helper;
   
+  const tagFactory = svg => {
+    if (svg) return tag => document.createElementNS("http://www.w3.org/2000/svg", tag);
+    else return tag => document.createElement(tag);
+  }; 
   
   //--------------- query ---------------//
   
@@ -32,7 +36,7 @@
   });
   
   
-  //--------------- insert ---------------//
+  //--------------- insert, insertSVG ---------------//
   
   {
     //array/cube, *, *, bool -> array
@@ -44,13 +48,10 @@
         throw Error('shape mismatch');
       }
       let newElm = new Array(n);
+      let f = tagFactory(svg);
       for (let i=0; i<n; i++) {
         let elm_i = elmSingle ? elm : elm[i];
-        if (typeof elm_i === 'string') {
-          elm_i = svg
-            ? document.createElementNS("http://www.w3.org/2000/svg", elm_i)
-            : document.createElement(elm_i);
-        }  //else assume elmt_i already an element
+        if (typeof elm_i === 'string') elm_i = f(elm_i);
         let posn_i = posnSingle ? posn : posn[i];
         posn_i = (posn_i === undefined || posn_i === 'end')
           ? null
@@ -73,62 +74,118 @@
   }
     
     
-  //--------------- insert, insertEach ---------------//
+  //--------------- insertEach ---------------//
+  
+  //func[, *] -> array
+  addArrayMethod('insertEach', function(f, posn) {
+    const n = this.length;
+    f = assert.func(assert.single(f));
+    var [posn, posnSingle] = polarize(posn);      
+    if (!posnSingle && posn.length !== n) throw Error('shape mismatch');
+    let newElm = [];
+    let k = 0;
+    for (let i=0; i<n; i++) {
+      let newElm_i = toArray(f(this[i], i, this));
+      let n_i = newElm_i.length;
+      let posn_i = posnSingle ? posn : posn[i];
+      posn_i = (posn_i === undefined || posn_i === 'end')
+        ? null
+        : posn_i === 'start'
+          ? this[i].firstChild
+          : posn_i;
+      newElm.length += n_i; 
+      for (let j=0; j<n_i; j++) {
+        this[i].insertBefore(newElm_i[j], posn_i);
+        newElm[k++] = newElm_i[j];
+      }
+    }
+    return newElm;
+  });
+  
+  
+  //--------------- create, createSVG ---------------// 
   
   {
   
-    //array/cube, *, * -> array
-    const insertEach = (x, f, posn, svg) => {
-      const n = x.length;
-      f = assert.func(assert.single(f));
-      var [posn, posnSingle] = polarize(posn);      
-      if (!posnSingle && posn.length !== n) throw Error('shape mismatch');
-      let newElm = [];
-      for (let i=0; i<n; i++) {
-        let newElm_i = toArray(f(x[i], i, x));
-        let n_i = newElm_i.length;
-        let posn_i = posnSingle ? posn : posn[i];
-        posn_i = (posn_i === undefined || posn_i === 'end')
-          ? null
-          : posn_i === 'start'
-            ? x[i].firstChild
-            : posn_i;
-        let nOld = newElm.length;
-        newElm.length += n_i; 
-        for (let j=0; j<n_i; j++) {
-          x[i].insertBefore(newElm_i[j], posn_i);
-          newElm[nOld+j] = newElm_i[j];
+    //*, num, bool => array
+    const create = (elm, n, svg) => {
+      elm = toArray(elm);
+      const ne = elm.length;
+      n = def(assert.single(n),1);
+      const newElm = new Array(ne*n);
+      const f = tagFactory(svg);
+      let k = 0;
+      for (let j=0; j<n; j++) {
+        for (let i=0; i<ne; i++) {
+          newElm[k++] = f(elm);
         }
       }
       return newElm;
     };
     
-    addArrayMethod('insertEach', function(f, posn) {
-      return insertEach(this, f, posn, false);
-    });
-    addArrayMethod('insertEachSVG', function(f, posn) {
-      return insertEach(this, f, posn, true);
-    });    
-    
+    //*, num -> array
+    qa.create    = (elm, n) => create(elm, n, false);
+    qa.createSVG = (elm, n) => create(elm, n, true);
+      
   }
+      
+      
+  //--------------- remove ---------------// 
+  
+  addArrayMethod('remove', function() {
+		const n = this.length;
+    for (let i=0; i<n; i++) this[i].parentNode.removeChild(this[i]);
+    return this;
+  });
   
   
-  SEEMS TO BE WORKING - DO CREATE NEXT AND TEST WHERE CREATE MULTIPLE IN .insertEach
+  //--------------- parent ---------------// 
   
-    
-    
+  //-> array
+  addArrayMethod('parent', function() {
+		const n = this.length;
+    for (let i=0; i<n; i++) this[i].parentNode;
+    return this;
+  });
+  
+  
+  //--------------- children, firstChild, lastChild ---------------// 
+
+  //-> array
+  addArrayMethod('children', function() {
+    const n = this.length;
+    const z = [];
+    k = 0;
+    for (let j=0; j<n; j++) {
+      let c = this[j].children;
+      let nc = c.length;
+      newElm.length += nc;
+      for (let i=0; i<nc; i++) {
+        newElm[k++] = c[i];
+      }
+    }
+    return z;
+  });
+  
+  //->array
+  ['firstChild', 'lastChild'].forEach(nm => {
+    addArrayMethod(nm, function() {
+      return this.prop(nm);
+    });
+  });
+
+  
+  
+  ANY ISSUES WITH THESE METHODS RETUNING TEXT NODES??????????
+  
+  
     //-----------------------------------------
 
     /* 
     
     ADD:
-    -parent      myNodes.parent()
-    -remove
-    -children     myNodes.children(), all children of myNodes (not grouped)
-    -firstChild   myNodes.firstChild()
-    -lastChild    myNodes.lastChild()
+
     -qa.fragment(n)
-    -qa.create(tag, n)   and createSVG
     -on      ie event listener
     -off      to remove events
     
@@ -150,6 +207,7 @@
           -note this means no need to create scale ...
           -could do similar with color interpolation   myDiv.$style('color', x.col('age').reds(same args as for scales)   
     -say callback to insertEach can return singleton or array
+    -html methods work with arrays, not elements - so eg   qa('div').at(0).remove() will not work
 
     
     */
