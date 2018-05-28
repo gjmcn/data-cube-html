@@ -170,13 +170,58 @@
   //->array
   ['firstChild', 'lastChild'].forEach(nm => {
     addArrayMethod(nm, function() {
-      return this.prop(nm);
+      const n = this.length;
+      const z = new Array(n);
+      for (let i=0; i<n; i++) z[i] = this[i][nm];
+      return z;
     });
   });
+  
+  
+  //--------------- removeAttr, addClass, removeClass, on, off ---------------// 
 
-  
-  
-  ANY ISSUES WITH THESE METHODS RETUNING TEXT NODES??????????
+  {
+    
+    //array/cube, str, *[, *, *] -> array/cube
+    const addRem = (x, nm, a, b, c) => {
+      const getFactory = arg => {
+        var [arg, argSingle] = polarize(arg);
+        if (argSingle) return () => arg;
+        if (arg.length !== n) throw Error('shape mismatch');
+        return i => arg[i];
+      };
+      const n = x.length;
+      const get_a = getFactory(a);
+      if (nm === 'on' || nm === 'off') {
+        const get_b = getFactory(b); 
+        const get_c = getFactory(c);
+        const mthd = (nm === 'on') ? 'addEventListener' : 'removeEventListener';
+        
+        
+        WORKING, BUT WANT TO PASS  me  (i.e. [evt.target]) as first arg to callback and the event as the second
+          -write a wrapper that takes the event as its single arg and passes  me and the evt to the actual false
+        
+        if b a singleton, only do it once!
+          
+          REQUIRE PASSED LISTERNER TO BE A FUNCTION? - IN THEORY CAN BE AN OBJECT  - SEE MDN
+        
+        
+        for (let i=0; i<n; i++) x[i][mthd](get_a(i), get_b(i), get_c(i));
+      }
+      else if (nm === 'removeAttr')  { for (let i=0; i<n; i++) x[i].removeAttribute(get_a(i)) }
+      else if (nm === 'addClass')    { for (let i=0; i<n; i++) x[i].classList.add(get_a(i)) }
+      else if (nm === 'removeClass') { for (let i=0; i<n; i++) x[i].classList.remove(get_a(i)) }
+      return x;
+    };
+     
+    //*[, *, *] -> array/cube
+    ['removeAttr', 'addClass', 'removeClass', 'on', 'off'].forEach(nm => {
+      addArrayMethod(nm, function(a, b, c) {  //b and c only used by on and off
+        return addRem(this, nm, a, b, c);
+      });
+    });
+        
+  }
   
   
     //-----------------------------------------
@@ -186,9 +231,8 @@
     ADD:
 
     -qa.fragment(n)
-    -on      ie event listener
-    -off      to remove events
-    
+    -  a way to get 'me' as an array in events easily?
+
 
     NOTES:
     -to add multiple elmts into single elmt
@@ -208,7 +252,7 @@
           -could do similar with color interpolation   myDiv.$style('color', x.col('age').reds(same args as for scales)   
     -say callback to insertEach can return singleton or array
     -html methods work with arrays, not elements - so eg   qa('div').at(0).remove() will not work
-
+    -??ANY ISSUES WITH THESE METHODS RETUNING TEXT NODES?????????? - eg when use firstChild
     
     */
 
