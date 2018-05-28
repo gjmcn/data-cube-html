@@ -11,6 +11,15 @@
     else return tag => document.createElement(tag);
   }; 
   
+  if ('me' in Event.prototype) {
+    throw Error(name + ' is already a property of Event.protoype');      
+  }
+  Object.defineProperty( Event.prototype, 'me', {
+    get() {return [this.target]},
+  });
+  
+  
+  
   //--------------- query ---------------//
   
   //str -> array
@@ -103,7 +112,7 @@
   });
   
   
-  //--------------- create, createSVG ---------------// 
+  //--------------- create, createSVG, fragment ---------------// 
   
   {
   
@@ -127,29 +136,37 @@
     qa.create    = (elm, n) => create(elm, n, false);
     qa.createSVG = (elm, n) => create(elm, n, true);
       
+    //num -> array
+    qa.fragment = n => {
+      n = def(assert.single(n),1);
+      const z = new Array(n);
+      for (let i=0; i<n; i++) z[i] = document.createDocumentFragment();
+      return z;
+    };
+    
   }
       
       
-  //--------------- remove ---------------// 
-  
+  //--------------- remove, raise, lower ---------------// 
+    
   addArrayMethod('remove', function() {
-		const n = this.length;
-    for (let i=0; i<n; i++) this[i].parentNode.removeChild(this[i]);
+    for (let i=0, n=this.length; i<n; i++) this[i].parentNode.removeChild(this[i]);
     return this;
   });
-  
-  
-  //--------------- parent ---------------// 
-  
-  //-> array
-  addArrayMethod('parent', function() {
-		const n = this.length;
-    for (let i=0; i<n; i++) this[i].parentNode;
+  addArrayMethod('raise', function() {
+    for (let i=0, n=this.length; i<n; i++) this[i].parentNode.insertBefore(this[i], null);
     return this;
   });
+  addArrayMethod('lower', function() {
+    for (let i=0, n=this.length; i<n; i++) {
+      let p = this[i].parentNode;
+      p.insertBefore(this[i], p.firstChild);
+    }
+    return this;
+  });
+
   
-  
-  //--------------- children, firstChild, lastChild ---------------// 
+  //--------------- children, firstChild, lastChild, parent ---------------// 
 
   //-> array
   addArrayMethod('children', function() {
@@ -168,8 +185,9 @@
   });
   
   //->array
-  ['firstChild', 'lastChild'].forEach(nm => {
+  ['firstChild', 'lastChild', 'parent'].forEach(nm => {
     addArrayMethod(nm, function() {
+      if (nm === 'parent') nm = 'parentNode';
       const n = this.length;
       const z = new Array(n);
       for (let i=0; i<n; i++) z[i] = this[i][nm];
@@ -196,16 +214,6 @@
         const get_b = getFactory(b); 
         const get_c = getFactory(c);
         const mthd = (nm === 'on') ? 'addEventListener' : 'removeEventListener';
-        
-        
-        WORKING, BUT WANT TO PASS  me  (i.e. [evt.target]) as first arg to callback and the event as the second
-          -write a wrapper that takes the event as its single arg and passes  me and the evt to the actual false
-        
-        if b a singleton, only do it once!
-          
-          REQUIRE PASSED LISTERNER TO BE A FUNCTION? - IN THEORY CAN BE AN OBJECT  - SEE MDN
-        
-        
         for (let i=0; i<n; i++) x[i][mthd](get_a(i), get_b(i), get_c(i));
       }
       else if (nm === 'removeAttr')  { for (let i=0; i<n; i++) x[i].removeAttribute(get_a(i)) }
@@ -224,42 +232,6 @@
   }
   
   
-    //-----------------------------------------
-
-    /* 
-    
-    ADD:
-
-    -qa.fragment(n)
-    -  a way to get 'me' as an array in events easily?
-
-
-    NOTES:
-    -to add multiple elmts into single elmt
-        -to insert a complex structure, use a frag, but note that this will only add one entry to the
-        array returned by  insertAll and this will be an empty frag
-    -use parent instead of retOrig:    qa('#my-div').insert('p').parent().insert( ... - or dave parent selection to variable
-    -if append fails halfway thru, changes persist - eg if an entry of elm is not an elmt
-    -no danger of mistakenly thinking ndeList an array since cube methods are array methods, cannot call them from nodeList
-    -no data as in d3; can do this easily, eg attach prop or attr (use vble to attach lots of info) and then eg
-        -   qa('circle').$style('width', me => me.data.age + 'px')
-        - alternatively, do not attach anything to element:   qa('circle').$style('width', x.col('age').add('px'))
-    -no joining on keys etc - see how compares to d3 adnd what would do here
-    -check passing callback to insert works with svg - main conern is that document fragments may not work?
-    -could wrap some d3 libs so can write eg:
-      - myDiv.$style('width', x.col('age').scale(rgMax, rgMin, domainMax, domainMin)   //domainMax/min based on data by default
-          -note this means no need to create scale ...
-          -could do similar with color interpolation   myDiv.$style('color', x.col('age').reds(same args as for scales)   
-    -say callback to insertEach can return singleton or array
-    -html methods work with arrays, not elements - so eg   qa('div').at(0).remove() will not work
-    -??ANY ISSUES WITH THESE METHODS RETUNING TEXT NODES?????????? - eg when use firstChild
-    
-    */
-
-  
-    
-    //JOINING TO DATA - IE ORDER - OR JUST AATTACH DATA
-
   module.exports = qa;
 
 }
