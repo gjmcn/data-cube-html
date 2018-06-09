@@ -19,7 +19,6 @@
   });
   
   
-  
   //--------------- query ---------------//
   
   //str -> array
@@ -48,27 +47,45 @@
   //--------------- insert, insertSVG ---------------//
   
   {
+        
     //array/cube, *, *, bool -> array
     const insert = (x, elm, posn, svg) => {
       const n = x.length;
       var [elm, elmSingle] = polarize(elm);
-      var [posn, posnSingle] = polarize(posn);          
+      var [posn, posnSingle] = polarize(posn);
       if ((!elmSingle && elm.length !== n) || (!posnSingle && posn.length !== n)) {
         throw Error('shape mismatch');
       }
-      let newElm = new Array(n);
-      let f = tagFactory(svg);
-      for (let i=0; i<n; i++) {
-        let elm_i = elmSingle ? elm : elm[i];
-        if (typeof elm_i === 'string') elm_i = f(elm_i);
-        let posn_i = posnSingle ? posn : posn[i];
-        posn_i = (posn_i === undefined || posn_i === 'end')
-          ? null
-          : posn_i === 'start'
-            ? x[i].firstChild
-            : posn_i;
-        x[i].insertBefore(elm_i, posn_i);
-        newElm[i] = elm_i;
+      const resolvePosn = m => {
+        const p = posnSingle ? posn : posn[m];
+        if (p === undefined || p === 'end') return null;
+        else if (p === 'start') return x[m].firstChild;
+        return p;  //p should be an element or null
+      };
+      let newElm;
+      if (elmSingle && typeof elm === 'function') {
+        newElm = [];
+        let k = 0;
+        for (let i=0; i<n; i++) {
+          let newElm_i = toArray(elm(x[i], i, x));
+          let n_i = newElm_i.length;
+          newElm.length += n_i;
+          let posn_i = resolvePosn(i);
+          for (let j=0; j<n_i; j++) {
+            x[i].insertBefore(newElm_i[j], posn_i);
+            newElm[k++] = newElm_i[j];
+          }
+        }
+      }
+      else {  //elm (or entries of elm) is a string or assumed to be an element 
+        newElm = new Array(n);
+        let f = tagFactory(svg);
+        for (let i=0; i<n; i++) {
+          let elm_i = elmSingle ? elm : elm[i];
+          if (typeof elm_i === 'string') elm_i = f(elm_i);
+          x[i].insertBefore(elm_i, resolvePosn(i));
+          newElm[i] = elm_i;
+        }
       }
       return newElm;
     };
@@ -82,35 +99,6 @@
     
   }
     
-    
-  //--------------- insertEach ---------------//
-  
-  //func[, *] -> array
-  addArrayMethod('insertEach', function(f, posn) {
-    const n = this.length;
-    f = assert.func(assert.single(f));
-    var [posn, posnSingle] = polarize(posn);      
-    if (!posnSingle && posn.length !== n) throw Error('shape mismatch');
-    let newElm = [];
-    let k = 0;
-    for (let i=0; i<n; i++) {
-      let newElm_i = toArray(f(this[i], i, this));
-      let n_i = newElm_i.length;
-      let posn_i = posnSingle ? posn : posn[i];
-      posn_i = (posn_i === undefined || posn_i === 'end')
-        ? null
-        : posn_i === 'start'
-          ? this[i].firstChild
-          : posn_i;
-      newElm.length += n_i; 
-      for (let j=0; j<n_i; j++) {
-        this[i].insertBefore(newElm_i[j], posn_i);
-        newElm[k++] = newElm_i[j];
-      }
-    }
-    return newElm;
-  });
-  
   
   //--------------- create, createSVG, fragment ---------------// 
   
