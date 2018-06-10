@@ -6,11 +6,11 @@
     assert, addArrayMethod, polarize, toArray, def
   } = helper;
   
-  const tagFactory = svg => {
-    if (svg) return tag => document.createElementNS("http://www.w3.org/2000/svg", tag);
-    else return tag => document.createElement(tag);
-  }; 
-  
+  const createElm = (tag,svg) => {
+    if (svg) return document.createElementNS("http://www.w3.org/2000/svg", tag);
+    return document.createElement(tag);
+  };
+    
   if ('me' in Event.prototype) {
     throw Error(name + ' is already a property of Event.protoype');      
   }
@@ -47,56 +47,67 @@
   //--------------- insert, insertSVG ---------------//
   
   {
-        
-    //array/cube, *, *, bool -> array
-    const insert = (x, elm, posn, svg) => {
+
+    //array/cube, *, *, *, bool -> array
+    const insert = (x, elm, nt, posn, svg) => {
       const n = x.length;
       var [elm, elmSingle] = polarize(elm);
+      var [nt, ntSingle] = polarize(nt);
       var [posn, posnSingle] = polarize(posn);
-      if ((!elmSingle && elm.length !== n) || (!posnSingle && posn.length !== n)) {
+      if ((!elmSingle  && elm.length  !== n) || 
+          (!ntSingle   && nt.length   !== n) ||
+          (!posnSingle && posn.length !== n)) {
         throw Error('shape mismatch');
       }
-      const resolvePosn = m => {
+      if (ntSingle && (nt === undefined || nt === null)) nt = 1;
+      const getNt = m => ntSingle ? nt : nt[m];
+      const getPosn = m => {
         const p = posnSingle ? posn : posn[m];
         if (p === undefined || p === 'end') return null;
         else if (p === 'start') return x[m].firstChild;
         return p;  //p should be an element or null
       };
-      let newElm;
-      if (elmSingle && typeof elm === 'function') {
-        newElm = [];
-        let k = 0;
-        for (let i=0; i<n; i++) {
-          let newElm_i = toArray(elm(x[i], i, x));
+      const getElm = m => {
+        const e = elmSingle ? elm : elm[m];
+        if (typeof e === 'string') {
+          const nt_m = getNt(m);
+          const newElm_m = new Array(nt_m);
+          for (let i=0; i<nt_m; i++) {
+            newElm_m[i] = createElm(e,svg);
+          }
+          return newElm_m;
+        }
+        if (typeof e === 'function') return e(x[m], m, x); //should be element or array of elements
+        return elm;  //should be element or array of elements
+      };
+      const newElm = [];
+      let k = 0;
+      for (let i=0; i<n; i++) {
+        let posn_i = getPosn(i);
+        let newElm_i = getElm(i);
+        if (Array.isArray(newElm_i)) {
           let n_i = newElm_i.length;
           newElm.length += n_i;
-          let posn_i = resolvePosn(i);
           for (let j=0; j<n_i; j++) {
             x[i].insertBefore(newElm_i[j], posn_i);
             newElm[k++] = newElm_i[j];
           }
         }
-      }
-      else {  //elm (or entries of elm) is a string or assumed to be an element 
-        newElm = new Array(n);
-        let f = tagFactory(svg);
-        for (let i=0; i<n; i++) {
-          let elm_i = elmSingle ? elm : elm[i];
-          if (typeof elm_i === 'string') elm_i = f(elm_i);
-          x[i].insertBefore(elm_i, resolvePosn(i));
-          newElm[i] = elm_i;
+        else {
+          x[i].insertBefore(newElm_i, posn_i);
+          newElm[k++] = newElm_i;
         }
       }
       return newElm;
     };
 
-    addArrayMethod('insert', function(elm, posn) {
-      return insert(this, elm, posn, false);
+    addArrayMethod('insert', function(elm, nt, posn) {
+      return insert(this, elm, nt, posn, false);
     });
-    addArrayMethod('insertSVG', function(elm, posn) {
-      return insert(this, elm, posn, true);
+    addArrayMethod('insertSVG', function(elm, nt, posn) {
+      return insert(this, elm, nt, posn, true);
     });
-    
+        
   }
     
   
@@ -110,11 +121,10 @@
       const ne = elm.length;
       n = def(assert.single(n),1);
       const newElm = new Array(ne*n);
-      const f = tagFactory(svg);
       let k = 0;
       for (let j=0; j<n; j++) {
         for (let i=0; i<ne; i++) {
-          newElm[k++] = f(elm);
+          newElm[k++] = createElm(elm,svg);
         }
       }
       return newElm;

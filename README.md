@@ -29,15 +29,15 @@ Include somewhere:
 
 ### Functions
 
-The package exports a single funtion. If the package is loaded in a `<script>` tag, this function is assigned to the global variable `qa`; the function is also called `qa` in these docs.
+The package exports a single funtion. If the package is loaded in a `<script>` tag, this function is assigned to the global variable `qa`; the function is also referred to as `qa` in these docs.
 
-`qa` has various other properties that are also functions.
+`qa` has various properties that are also functions.
 
 ---
 
-<a name="function_qa" href="#function_qa">#</a> **qa:** `qa(selec)`
+<a name="function_qa" href="#function_qa">#</a> **qa:** `qa(sel)`
 
-Returns an array of elements that match the CSS selector string `selec`.
+Returns an array of elements that match the CSS selector string `sel`.
 
 ---
 
@@ -55,7 +55,7 @@ Returns an array containing the new elements.
 
 ---
 
-<a name="function_fragment" href="#function_fragmant">#</a> **fragment:** `qa.fragment(n = 1)`
+<a name="function_fragment" href="#function_fragment">#</a> **fragment:** `qa.fragment(n = 1)`
 
 Returns an array of `n` new document fragments.
 
@@ -65,25 +65,34 @@ Returns an array of `n` new document fragments.
 
 ---
 
-<a name="method_qa" href="#method_qa">#</a> **qa:** `Array.prototype.qa(selec)`
+<a name="method_qa" href="#method_qa">#</a> **qa:** `Array.prototype.qa(sel)`
 
 Like the function `qa`, but the returned array only includes elements that are descendents of at least one entry of the calling array (all entries of the calling array should be elements).
 
 ---
 
 <a name="method_insert" href="#method_insert">#</a><br>
-**insert:** `Array.prototype.insert(elm, posn = 'end')`<br>
-**insertSVG:** `Array.prototype.insertSVG(elm, posn = 'end')`
+**insert:** `Array.prototype.insert(elm, n = 1, posn = 'end')`<br>
+**insertSVG:** `Array.prototype.insertSVG(elm, n = 1, posn = 'end')`
 
-Insert HTML elements (`insert`) or SVG elements (`insertSVG`) into the elements of the calling array.
+Insert HTML elements (`insert`) or SVG elements (`insertSVG`) as children of the elements in the calling array.
 
 `elm` specifies what to insert:
 
-* (singleton) function: called for each entry of the calling array; passed the entry (the 'target element'), the vector index of the entry and the calling array. The function should return an element or an array of elements; these are inserted into the target element.
+* string: e.g. `'div'`, a new element of this type is created  (or multiple elements if `n` is used) and inserted into the corrersponding 'target element'.
 
-* element: this is inserted into the target element.
+* element: is inserted into the target element.
 
-* string: this should be a tag name (e.g. `'div'`); an element of this type is created and inserted into the target element.
+!!HERE!!!!!!!!!!!! - happy with code, but we for above case we actually allow array
+of elemets - for each target element. Make this clear or restrict to a single element
+??ARE WE HAPPY WITH NO GROUPS?s
+
+
+
+
+* function: passed the corresponding entry of the calling array (the target element), the vector index of the entry and the calling array. The function should return an element or an array of elements; these are inserted into the target element.
+
+`n`is the number of elements to insert into the target element. `n` is only used when `elm` is a string.
 
 `posn` specifies where an element is to be inserted inside the target element:
 
@@ -93,19 +102,15 @@ Insert HTML elements (`insert`) or SVG elements (`insertSVG`) into the elements 
 
 * otherwise: before `posn` (in this case, `posn` should be a descendent of the target element).
 
-`elm` and `posn` are broadcast.
+`elm`, `n` and `posn` are broadcast &mdash; each can be a singleton or have the same number of entries as the calling array.
 
 Notes:
 
 * `insert` need not insert new elements; it can be used to move elements that are already in the document.
 
-* When adding a single element to each target element, `elm` is typically an element or a string (or an array of elements or strings). For anything more complicated, `elm` must be a function.
+* When `elm` is a function or when `n` is not `1`, multiple elements can be added to each target so the vector indices of the target elements and inserted elements may not correspond.
 
-* When `elm` is a function:
-
-  * multiple elements can be added to each target so the vector indices of the target elements and inserted elements may not correspond.
-
-  * it makes no difference whether `insert` or `insertSVG` is called since the function `elm` provides the elements to be inserted
+* When `elm` is a function, it makes no difference whether `insert` or `insertSVG` is called since the function `elm` provides the elements to be inserted
 
 ---
 
