@@ -1,8 +1,6 @@
-[DataCube](https://github.com/gjmcn/data-cube) HTML methods:
+[DataCube](https://github.com/gjmcn/data-cube) HTML methods and function.
 
 * Wraps JavaScript functions for creating, selecting, styling, ... HTML elements, enabling an array-oriented approach to DOM manipulation.
-
-* Adds methods to `Array.protoype` &mdash; as DataCube and all plugins do. Also creates a global variable `qa` for element selection.
 
 * Since the DOM is hierarchical rather than multidimensional, the HTML methods are not interested the shape (or keys or labels) of cubes:
 
@@ -23,6 +21,8 @@ The package uses the Universal Module Definition (UMD). It can be loaded in a  `
 Include somewhere:
 
 * how can use D3 style data attaching or match arrays
+
+* iterates over elments in calling array, within these selection is by order in the DOM
 
 
 ## API Reference
@@ -81,14 +81,7 @@ Insert HTML elements (`insert`) or SVG elements (`insertSVG`) as children of the
 
 * string: e.g. `'div'`, a new element of this type is created  (or multiple elements if `n` is used) and inserted into the corrersponding 'target element'.
 
-* element: is inserted into the target element.
-
-!!HERE!!!!!!!!!!!! - happy with code, but we for above case we actually allow array
-of elemets - for each target element. Make this clear or restrict to a single element
-??ARE WE HAPPY WITH NO GROUPS?s
-
-
-
+* element: is inserted into the target element. If an entry of `elm` is an array of elements, all the elements are inserted into the corresponding target element.
 
 * function: passed the corresponding entry of the calling array (the target element), the vector index of the entry and the calling array. The function should return an element or an array of elements; these are inserted into the target element.
 
@@ -114,7 +107,7 @@ Notes:
 
 ---
 
-<a name="method_remove" href="#method_remove">#</a> **remove:** `remove()`
+<a name="method_remove" href="#method_remove">#</a> **remove:** `Array.prototype.remove()`
 
 Remove elements from the DOM.
 
@@ -132,11 +125,94 @@ Returns the calling array &mdash; i.e. the moved elements.
 
 ---
 
+<a name="method_children" href="#method_children">#</a> **children:** `Array.prototype.children()`
 
+Children of all entries in the calling array.
 
+`children` iterates over the entries of the calling
 
+Returns a new array.
 
+---
 
+<a name="method_parent" href="#method_parent">#</a><br>
+**parent:** `Array.prototype.parent()`<br>
+**firstChild:** `Array.prototype.firstChild()`<br>
+**lastChild:** `Array.prototype.lastChild()`
+
+Get parent, first child or last child of each entry of the calling array.
+
+Returns a new array.
+
+---
+
+<a name="method_attr" href="#method_attr">#</a><br>
+**attr:** `Array.prototype.attr(name)`<br>
+**style:** `Array.prototype.style(name)`
+
+Get attribute or style `name` of each entry in the calling array.
+
+Returns a new array.
+
+Note: this package does not include a method to get properties of elements since the core DataCube method `prop` can be used, e.g. `x.prop('innerHTML')`.
+
+---
+
+<a name="method_set_attr" href="#method_set_attr">#</a><br>
+**$attr:** `Array.prototype.$attr(name0, val0, name1, val1, ...)`<br>
+**$style:** `Array.prototype.$style(name0, val0, name1, val1, ...)`
+
+Set one or more attributes or styles of each entry of the calling array. 
+
+See the core DataCube method [$prop](https://github.com/gjmcn/data-cube/wiki/Entrywise#method_set_prop) for the detailed behavior of these methods.
+
+Returns the calling array.
+
+---
+
+<a name="method_remove_attr" href="#method_remove_attr">#</a><br>
+**removeAttr:** `Array.prototype.removeAttr(name)`<br>
+**addClass:** `Array.prototype.addClass(name)`<br>
+**removeClass:** `Array.prototype.removeClass(name)`
+
+Remove attribute `name`, add class `name` or remove class `name` from each entry of the calling array.
+
+`name` is broadcast.
+
+Returns the calling array.
+
+---
+
+<a name="method_on" href="#method_on">#</a><br>
+**on:** `Array.prototype.on(type, listener, useCapture = false)`<br>
+**off:** `Array.prototype.off(type, listener, useCapture = false)`
+
+Add (`on`) or remove (`off`) event listener to each entry of the calling array.
+
+`type` is the event type, e.g. `'click'`.
+
+`listener` is the function to be called when the event occurs.
+
+`useCapture` indicates whether to use capture &mdash; see [EventTarget.addEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) for details.
+
+`type`, `listener` and `useCapture` are broadcast.
+
+Note: `on` and `off` call the native methods [EventTarget.addEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) and [EventTarget.removeEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener) respectively. As with these methods, `listener` can be an object implementing the `EventListener` interface (rather than a function) and `useCapture` can be an options object (rather than a Boolean).
+
+---
+
+### Event Properties
+
+---
+
+<a name="property_me" href="#property_me">#</a> **me:** `Event.me`
+
+An array containing the element that dispatched the event. This is simply `Event.me` wrapped in an array so that it can be used with DataCube methods, e.g.
+
+```js
+//remove a circle when it is clicked
+qa('circle').on('click', evt => evt.me.remove());
+```
 
 
 
