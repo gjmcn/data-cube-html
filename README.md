@@ -22,7 +22,12 @@ Include somewhere:
 
 * how can use D3 style data attaching or match arrays
 
+* say similar to and inspired by D3
+
 * iterates over elments in calling array, within these selection is by order in the DOM
+
+* html methods work with arrays, not elements - so eg   qa('div')[0].remove() will not work
+
 
 
 ## API Reference
@@ -154,7 +159,7 @@ Get attribute or style `name` of each entry in the calling array.
 
 Returns a new array.
 
-Note: this package does not include a method to get properties of elements since the core DataCube method `prop` can be used, e.g. `x.prop('innerHTML')`.
+Note: use the core DataCube method `prop` to get a property of each element, e.g. `x.prop('innerHTML')`.
 
 ---
 
@@ -162,11 +167,19 @@ Note: this package does not include a method to get properties of elements since
 **$attr:** `Array.prototype.$attr(name0, val0, name1, val1, ...)`<br>
 **$style:** `Array.prototype.$style(name0, val0, name1, val1, ...)`
 
-Set one or more attributes or styles of each entry of the calling array. 
+For each entry, set attribute/style `name0` to `val0`, `name1` to `val1`, ...
 
-See the core DataCube method [$prop](https://github.com/gjmcn/data-cube/wiki/Entrywise#method_set_prop) for the detailed behavior of these methods.
+If a value is a function, it is _not_ used as the new value. Instead, the function is passed the 'current entry' of the calling array, the current (vector) index and the calling array; the returned value is used as the new attribute/style value.
+
+All arguments are broadcast.
 
 Returns the calling array.
+
+Notes: 
+
+* If an error is thrown when settng a value, any already-made changes will persist.
+
+* Use the core DataCube method `$prop` to set properties of elements, e.g. `x.$prop('innerHTML','hello')`.
 
 ---
 

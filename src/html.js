@@ -6,11 +6,9 @@
     assert, addArrayMethod, polarize, toArray, def
   } = helper;
   
-  const createElm = (tag,svg) => {
-    if (svg) return document.createElementNS("http://www.w3.org/2000/svg", tag);
-    return document.createElement(tag);
-  };
-    
+  const createElmHTML = tag => document.createElement(tag);
+  const createElmSVG  = tag => document.createElementNS("http://www.w3.org/2000/svg", tag);
+      
   if ('me' in Event.prototype) {
     throw Error(name + ' is already a property of Event.protoype');      
   }
@@ -19,7 +17,7 @@
   });
   
   
-  //--------------- query ---------------//
+  //--------------- qa ---------------//
   
   //str -> array
   const qa = q => [...document.querySelectorAll(assert.single(q))];
@@ -67,13 +65,14 @@
         else if (p === 'start') return x[m].firstChild;
         return p;  //p should be an element or null
       };
+      const createElm = svg ? createElmSVG : createElmHTML;
       const getElm = m => {
         const e = elmSingle ? elm : elm[m];
         if (typeof e === 'string') {
           const nt_m = getNt(m);
           const newElm_m = new Array(nt_m);
           for (let i=0; i<nt_m; i++) {
-            newElm_m[i] = createElm(e,svg);
+            newElm_m[i] = createElm(e);
           }
           return newElm_m;
         }
@@ -120,11 +119,12 @@
       elm = toArray(elm);
       const ne = elm.length;
       n = def(assert.single(n),1);
+      const createElm = svg ? createElmSVG : createElmHTML;
       const newElm = new Array(ne*n);
       let k = 0;
       for (let j=0; j<n; j++) {
         for (let i=0; i<ne; i++) {
-          newElm[k++] = createElm(elm,svg);
+          newElm[k++] = createElm(elm[i]);
         }
       }
       return newElm;
