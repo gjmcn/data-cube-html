@@ -1,4 +1,4 @@
-[DataCube](https://github.com/gjmcn/data-cube) HTML methods and function.
+[DataCube](https://github.com/gjmcn/data-cube) HTML methods and functions.
 
 * Wraps JavaScript functions for creating, selecting, styling, ... HTML elements, enabling an array-oriented approach to DOM manipulation.
 
@@ -14,7 +14,7 @@
 
 Install: `npm install --save data-cube-html`
 
-The package uses the Universal Module Definition (UMD). It can be loaded in a  `<script>` tag in HTML or with an `import` statement in JavaScript.
+The package uses the Universal Module Definition (UMD) so can be loaded in a  `<script>` tag or imported with JavaScript.
 
 ## Notes
 
