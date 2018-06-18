@@ -1,10 +1,9 @@
 {
   'use strict';
   
-	const helper = require('data-cube-helper');
-  const { 
+  const {
     assert, addArrayMethod, polarize, toArray, def
-  } = helper;
+  } = Array.prototype._helper;
   
   const createElmHTML = tag => document.createElement(tag);
   const createElmSVG  = tag => document.createElementNS("http://www.w3.org/2000/svg", tag);

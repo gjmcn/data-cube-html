@@ -17,9 +17,6 @@
     "url": "https://github.com/gjmcn/data-cube-html/issues"
   },
   "homepage": "https://github.com/gjmcn/data-cube-html#readme",
-  "dependencies": {
-    "data-cube-helper": "^0.1.0"
-  },
   "devDependencies": {
     "rollup": "^0.59.1",
     "rollup-plugin-commonjs": "^9.1.0",
