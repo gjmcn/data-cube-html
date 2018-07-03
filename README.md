@@ -1,15 +1,5 @@
 [DataCube](https://github.com/gjmcn/data-cube) HTML methods and functions.
 
-* Wraps JavaScript functions for creating, selecting, styling, ... HTML elements, enabling an array-oriented approach to DOM manipulation.
-
-* Since the DOM is hierarchical rather than multidimensional, the HTML methods are not interested the shape (or keys or labels) of cubes:
-
-  * cubes are treated as standard arrays &mdash; shape, keys and labels are ignored
-  
-  * methods do not automatically convert arrays to cubes
-
-  * methods return arrays rather than cubes
-
 ## Install/Load
 
 Install: `npm install --save data-cube-html`
@@ -19,6 +9,10 @@ The package uses the Universal Module Definition (UMD) so can be loaded in a  `<
 ## Notes
 
 Include somewhere:
+
+HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+* unlike core DataCube methods, HTML methods do not convert the calling array to a cube.
 
 * how can use D3 style data attaching or match arrays
 
@@ -34,7 +28,7 @@ Include somewhere:
 
 ### Functions
 
-The package exports a single funtion. If the package is loaded in a `<script>` tag, this function is assigned to the global variable `qa`; the function is also referred to as `qa` in these docs.
+The package exports the function `qa`. If the package is loaded in a `<script>` tag, `qa` is a global variable.
 
 `qa` has various properties that are also functions.
 
@@ -101,6 +95,8 @@ Insert HTML elements (`insert`) or SVG elements (`insertSVG`) as children of the
 * otherwise: before `posn` (in this case, `posn` should be a descendent of the target element).
 
 `elm`, `n` and `posn` are broadcast &mdash; each can be a singleton or have the same number of entries as the calling array.
+
+Returns an array containing the new elements.
 
 Notes:
 
@@ -210,6 +206,8 @@ Add (`on`) or remove (`off`) event listener to each entry of the calling array.
 
 `type`, `listener` and `useCapture` are broadcast.
 
+Returns the calling array.
+
 Note: `on` and `off` call the native methods [EventTarget.addEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) and [EventTarget.removeEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener) respectively. As with these methods, `listener` can be an object implementing the `EventListener` interface (rather than a function) and `useCapture` can be an options object (rather than a Boolean).
 
 ---
@@ -220,7 +218,7 @@ Note: `on` and `off` call the native methods [EventTarget.addEventListener](http
 
 <a name="property_me" href="#property_me">#</a> **me:** `Event.me`
 
-An array containing the element that dispatched the event. This is simply `Event.me` wrapped in an array so that it can be used with DataCube methods, e.g.
+A 1-entry array containing the element that dispatched the event. This is simply `Event.target` wrapped in an array so that it can be used with DataCube methods, e.g.
 
 ```js
 //remove a circle when it is clicked
