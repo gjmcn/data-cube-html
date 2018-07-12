@@ -1,4 +1,4 @@
-[DataCube](https://github.com/gjmcn/data-cube) HTML methods and functions.
+[Data-Cube](https://github.com/gjmcn/data-cube) HTML methods and functions.
 
 ## Install/Load
 
@@ -12,7 +12,7 @@ Include somewhere:
 
 HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-* unlike core DataCube methods, HTML methods do not convert the calling array to a cube.
+* unlike core Data-Cube methods, HTML methods do not convert the calling array to a cube.
 
 * how can use D3 style data attaching or match arrays
 
@@ -155,7 +155,7 @@ Get attribute or style `name` of each entry in the calling array.
 
 Returns a new array.
 
-Note: use the core DataCube method `prop` to get a property of each element, e.g. `x.prop('innerHTML')`.
+Note: use the core Data-Cube method `prop` to get a property of each element, e.g. `x.prop('innerHTML')`.
 
 ---
 
@@ -175,7 +175,7 @@ Notes:
 
 * If an error is thrown when settng a value, any already-made changes will persist.
 
-* Use the core DataCube method `$prop` to set properties of elements, e.g. `x.$prop('innerHTML','hello')`.
+* Use the core Data-Cube method `$prop` to set properties of elements, e.g. `x.$prop('innerHTML','hello')`.
 
 ---
 
@@ -218,7 +218,7 @@ Note: `on` and `off` call the native methods [EventTarget.addEventListener](http
 
 <a name="property_me" href="#property_me">#</a> **me:** `Event.me`
 
-A 1-entry array containing the element that dispatched the event. This is simply `Event.target` wrapped in an array so that it can be used with DataCube methods, e.g.
+A 1-entry array containing the element that dispatched the event. This is simply `Event.target` wrapped in an array so that it can be used with Data-Cube methods, e.g.
 
 ```js
 //remove a circle when it is clicked
