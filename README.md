@@ -22,6 +22,8 @@ HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 * html methods work with arrays, not elements - so eg   qa('div')[0].remove() will not work
 
+* Many of the HTML methods mutate elements (and it is intuitive when they do), but the `$` prefix is only used for the obvious setters `$attr` (set attribute) and `$style` (set style).
+
 
 
 ## API Reference
@@ -151,7 +153,7 @@ Returns a new array.
 **attr:** `Array.prototype.attr(name)`<br>
 **style:** `Array.prototype.style(name)`
 
-Get attribute or style `name` of each entry in the calling array.
+Get attribute/style `name` of each entry of the calling array.
 
 Returns a new array.
 
@@ -160,22 +162,30 @@ Note: use the core Data-Cube method `prop` to get a property of each element, e.
 ---
 
 <a name="method_set_attr" href="#method_set_attr">#</a><br>
-**$attr:** `Array.prototype.$attr(name0, val0, name1, val1, ...)`<br>
-**$style:** `Array.prototype.$style(name0, val0, name1, val1, ...)`
+**$attr:** `Array.prototype.$attr(name, val)`<br>
+**$style:** `Array.prototype.$style(name, val)`
 
-For each entry, set attribute/style `name0` to `val0`, `name1` to `val1`, ...
+For each entry, set attribute/style `name` to `val`.
 
-If a value is a function, it is _not_ used as the new value. Instead, the function is passed the 'current entry' of the calling array, the current (vector) index and the calling array; the returned value is used as the new attribute/style value.
+If `val` is a (singleton) function, it is _not_ used as the new value. Instead, the function is passed the 'current entry' of the calling array, its vector index and the calling array; the returned value is used as the new attribute/style value.
 
-All arguments are broadcast.
+`val` is broadcast.
 
 Returns the calling array.
 
 Notes: 
 
-* If an error is thrown when settng a value, any already-made changes will persist.
+* If an error is thrown when settng an attribute/style, any already-made changes will persist.
 
 * Use the core Data-Cube method `$prop` to set properties of elements, e.g. `x.$prop('innerHTML','hello')`.
+
+---
+
+<a name="method_has_attr" href="#method_has_attr">#</a><br>
+**hasAttr:** `Array.prototype.hasAttr(name)`<br>
+**hasClass:** `Array.prototype.hasClass(name)`<br>
+
+Returns a new array with Boolean entries. An entry is `true` if the corresponding entry of the calling array has attribute/class `name`.
 
 ---
 
@@ -185,8 +195,6 @@ Notes:
 **removeClass:** `Array.prototype.removeClass(name)`
 
 Remove attribute `name`, add class `name` or remove class `name` from each entry of the calling array.
-
-`name` is broadcast.
 
 Returns the calling array.
 

@@ -193,6 +193,68 @@
   });
   
   
+  //--------------- style, attr, hasAttr, hasClass ---------------// 
+  
+  {
+  
+    //array/cube, str, str -> array
+    const getInfo = (x, mthd, nm) => {
+      nm = assert.single(nm);
+      const n = x.length,
+            z = new Array(n);
+      if      (mthd === 'style')   { for (let i=0; i<n; i++) z[i] = window.getComputedStyle(x[i])[nm] }
+      else if (mthd === 'attr')    { for (let i=0; i<n; i++) z[i] = x[i].getAttribute(nm) }
+      else if (mthd === 'hasAttr') { for (let i=0; i<n; i++) z[i] = x[i].hasAttribute(nm) }
+      else                         { for (let i=0; i<n; i++) z[i] = x[i].classList.contains(nm) }
+      return z;
+    };
+
+    //* -> array/cube
+    ['style','attr','hasAttr','hasClass'].forEach(mthd => {
+      addArrayMethod(mthd, function(nm) {
+        return getInfo(this, mthd, nm);
+      });
+    });
+    
+  }
+    
+  //--------------- $style, $attr ---------------// 
+  
+  {
+    
+    //array/cube, str, str, * -> array/cube
+    const setInfo = (x, mthd, nm, val) => {
+      nm = assert.single(nm);
+      var [val, valSingle] = polarize(val);
+      const n = x.length;
+      if (valSingle) {
+        if (typeof val === 'function') { 
+          if (mthd === '$style') { for (let j=0; j<n; j++) x[j].style[nm] = val(x[j], j, x) }
+          else                   { for (let j=0; j<n; j++) x[j].setAttribute(nm, val(x[j], j, x)) }
+        }
+        else {
+          if (mthd === '$style') { for (let j=0; j<n; j++) x[j].style[nm] = val }
+          else                   { for (let j=0; j<n; j++) x[j].setAttribute(nm, val) } 
+        }
+      }
+      else {
+        if (val.length !== n) throw Error('shape mismatch');
+        if (mthd === '$style') { for (let j=0; j<n; j++) x[j].style[nm] = val[j] }
+        else                   { for (let j=0; j<n; j++) x[j].setAttribute(nm, val[j]) } 
+      }      
+      return x;
+    };
+        
+    //str, * -> array/cube
+    ['$style','$attr'].forEach(mthd => {
+      addArrayMethod(mthd, function(nm, val) {
+        return setInfo(this, mthd, nm, val);
+      });
+    });
+    
+  }
+    
+  
   //--------------- removeAttr, addClass, removeClass, on, off ---------------// 
 
   {
