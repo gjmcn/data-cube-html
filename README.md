@@ -1,25 +1,21 @@
----
+<hr><b>
 
-<b>This module is at an early stage of development:
+This module is at an early stage of development:
 
 * the functions listed below have been implemented, but have not been thoroughly checked or tested
 
-* the behavior of existing functions may be modified; new functions will be added</b>
+* the behavior of existing functions may be modified; new functions will be added**
 
----
+</b><hr>
 
-This [Data-Cube](https://github.com/gjmcn/data-cube) plugin enables array-oriented DOM manipulation.
-
-Note: unlike core Data-Cube methods, HTML methods do not convert the calling array to a cube.
+DOM manipulation functions and methods for [Data-Cube](https://github.com/gjmcn/data-cube).
 
 ## Install
 
-Install: `npm install --save data-cube-html`
+`npm install --save data-cube-html`
 
 
-## API Reference
-
-### Functions
+## Functions
 
 The module exports the function `qa`. If the module is loaded in a `<script>` tag, `qa` is a global variable.
 
@@ -37,7 +33,7 @@ Returns an array of elements that match the CSS selector string `sel`.
 **create:** `qa.create(elm, n = 1)`<br>
 **createSVG:** `qa.createSVG(elm, n = 1)`
 
-Create HTML (`create`) or SVG (`createSVG`) elements.
+Create HTML or SVG elements.
 
 `elm` specifies the type of element to create, e.g. `'div'` or `['circle','rect']`.
 
@@ -53,13 +49,15 @@ Returns an array of `n` new document fragments.
 
 ---
 
-### Array Methods
+## Array Methods
+
+Note: unlike core Data-Cube methods, HTML methods do not convert the calling array to a cube.
 
 ---
 
 <a name="method_qa" href="#method_qa">#</a> **qa:** `Array.prototype.qa(sel)`
 
-Like the function `qa`, but the returned array only includes elements that are descendents of at least one entry of the calling array (all entries of the calling array should be elements).
+Like the function `qa`, but the returned array only includes elements that are descendents of at least one entry of the calling array.
 
 ---
 
@@ -67,7 +65,7 @@ Like the function `qa`, but the returned array only includes elements that are d
 **insert:** `Array.prototype.insert(elm, n = 1, posn = 'end')`<br>
 **insertSVG:** `Array.prototype.insertSVG(elm, n = 1, posn = 'end')`
 
-Insert HTML elements (`insert`) or SVG elements (`insertSVG`) as children of the elements in the calling array.
+Insert HTML or SVG elements as children of the elements in the calling array.
 
 `elm` specifies what to insert:
 
