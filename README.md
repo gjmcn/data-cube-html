@@ -1,36 +1,27 @@
-[Data-Cube](https://github.com/gjmcn/data-cube) HTML methods and functions.
+---
 
-## Install/Load
+<b>This module is at an early stage of development:
+
+* the functions listed below have been implemented, but have not been thoroughly checked or tested
+
+* the behavior of existing functions may be modified; new functions will be added</b>
+
+---
+
+This [Data-Cube](https://github.com/gjmcn/data-cube) plugin enables array-oriented DOM manipulation.
+
+Note: unlike core Data-Cube methods, HTML methods do not convert the calling array to a cube.
+
+## Install
 
 Install: `npm install --save data-cube-html`
-
-The package uses the Universal Module Definition (UMD) so can be loaded in a  `<script>` tag or imported with JavaScript.
-
-## Notes
-
-Include somewhere:
-
-HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-* unlike core Data-Cube methods, HTML methods do not convert the calling array to a cube.
-
-* how can use D3 style data attaching or match arrays
-
-* say similar to and inspired by D3
-
-* iterates over elments in calling array, within these selection is by order in the DOM
-
-* html methods work with arrays, not elements - so eg   qa('div')[0].remove() will not work
-
-* Many of the HTML methods mutate elements (and it is intuitive when they do), but the `$` prefix is only used for the obvious setters `$attr` (set attribute) and `$style` (set style).
-
 
 
 ## API Reference
 
 ### Functions
 
-The package exports the function `qa`. If the package is loaded in a `<script>` tag, `qa` is a global variable.
+The module exports the function `qa`. If the module is loaded in a `<script>` tag, `qa` is a global variable.
 
 `qa` has various properties that are also functions.
 
