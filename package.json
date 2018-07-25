@@ -1,5 +1,5 @@
 {
-  "name": "data-cube-html",
+  "name": "@gjmcn/data-cube-html",
   "version": "0.1.0",
   "description": "DOM manipulation functions and methods for Data-Cube.",
   "main": "dist/html.js",

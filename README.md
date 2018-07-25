@@ -12,7 +12,7 @@ DOM manipulation functions and methods for [Data-Cube](https://github.com/gjmcn/
 
 ## Install
 
-`npm install --save data-cube-html`
+`npm install --save @gjmcn/data-cube-html`
 
 
 ## Functions
