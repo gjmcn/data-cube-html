@@ -1,6 +1,6 @@
 {
   "name": "@gjmcn/data-cube-html",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "DOM manipulation functions and methods for Data-Cube.",
   "main": "dist/html.js",
   "scripts": {
@@ -24,6 +24,6 @@
     "rollup-plugin-uglify": "^3.0.0"
   },
   "peerDependencies": {
-    "data-cube": "^0.1.0"
+    "@gjmcn/data-cube": "^0.1.0"
   }
 }
