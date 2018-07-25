@@ -1,10 +1,10 @@
 <hr><b>
 
-This module is at an early stage of development:
+This module is at a very early stage of development:
 
 * the functions listed below have been implemented, but have not been thoroughly checked or tested
 
-* the behavior of existing functions may be modified; new functions will be added**
+* the behavior of existing functions may be modified; new functions will be added
 
 </b><hr>
 
@@ -69,7 +69,7 @@ Insert HTML or SVG elements as children of the elements in the calling array.
 
 `elm` specifies what to insert:
 
-* string: e.g. `'div'`, a new element of this type is created  (or multiple elements if `n` is used) and inserted into the corrersponding 'target element'.
+* string: e.g. `'div'`, a new element of this type is created  (or multiple elements if `n` is used) and inserted into the corresponding 'target element'.
 
 * element: is inserted into the target element. If an entry of `elm` is an array of elements, all the elements are inserted into the corresponding target element.
 
@@ -85,7 +85,7 @@ Insert HTML or SVG elements as children of the elements in the calling array.
 
 * otherwise: before `posn` (in this case, `posn` should be a descendent of the target element).
 
-`elm`, `n` and `posn` are broadcast &mdash; each can be a singleton or have the same number of entries as the calling array.
+All arguments are broadcast &mdash; i.e. each argument can be a singleton or have the same number of entries as the calling array.
 
 Returns an array containing the new elements.
 
@@ -93,9 +93,9 @@ Notes:
 
 * `insert` need not insert new elements; it can be used to move elements that are already in the document.
 
-* When `elm` is a function or when `n` is not `1`, multiple elements can be added to each target so the vector indices of the target elements and inserted elements may not correspond.
+* Since multiple elements can be added to each target element, the vector indices of the target elements and the inserted elements may not correspond.
 
-* When `elm` is a function, it makes no difference whether `insert` or `insertSVG` is called since the function `elm` provides the elements to be inserted
+* When `elm` is a function, it makes no difference whether `insert` or `insertSVG` is called since the `elm` function provides the elements to be inserted.
 
 ---
 
@@ -103,7 +103,7 @@ Notes:
 
 Remove elements from the DOM.
 
-Returns the calling array &mdash; ie the removed elements.
+Returns the calling array &mdash; i.e. the removed elements.
 
 ---
 
@@ -111,7 +111,7 @@ Returns the calling array &mdash; ie the removed elements.
 **raise:** `Array.prototype.raise()`<br>
 **lower:** `Array.prototype.lower()`
 
-Move elements to be the last child (`raise`) or first child (`lower`) of their parents.
+Move elements to be the last child (`raise`) or the first child (`lower`) of their parents.
 
 Returns the calling array &mdash; i.e. the moved elements.
 
@@ -120,8 +120,6 @@ Returns the calling array &mdash; i.e. the moved elements.
 <a name="method_children" href="#method_children">#</a> **children:** `Array.prototype.children()`
 
 Children of all entries in the calling array.
-
-`children` iterates over the entries of the calling
 
 Returns a new array.
 
@@ -201,7 +199,7 @@ Add (`on`) or remove (`off`) event listener to each entry of the calling array.
 
 `useCapture` indicates whether to use capture &mdash; see [EventTarget.addEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) for details.
 
-`type`, `listener` and `useCapture` are broadcast.
+All arguments are broadcast.
 
 Returns the calling array.
 
