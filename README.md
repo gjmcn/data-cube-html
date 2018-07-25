@@ -37,7 +37,7 @@ Create HTML or SVG elements.
 
 `elm` specifies the type of element to create, e.g. `'div'` or `['circle','rect']`.
 
-`n` specifies how many multiples of the elements in `elm` to create. For example, `qa.create('div',2)` creates 2 divs, `qa.createSVG(['circle','rect'],3)` creates 6 elements: circle, rect, circle, rect, circle, rect.
+`n` specifies how many multiples of the elements in `elm` to create. For example, `qa.create('div', 2)` creates 2 divs, `qa.createSVG(['circle','rect'], 3)` creates 6 elements: circle, rect, circle, rect, circle, rect.
 
 Returns an array containing the new elements.
 
