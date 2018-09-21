@@ -76,7 +76,7 @@
           return newElm_m;
         }
         if (typeof e === 'function') return e(x[m], m, x); //should be element or array of elements
-        return elm;  //should be element or array of elements
+        return e;  //should be element or array of elements
       };
       const newElm = [];
       let k = 0;
