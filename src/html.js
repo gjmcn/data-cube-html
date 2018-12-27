@@ -297,8 +297,11 @@
   addArrayMethod('sketch', function(w, h, id) {
     w = assert.single(w);
     h = assert.single(h);
-    id = assert.single(id);
+    id = '' + assert.single(id);
     const canvas = this.insert('canvas')[0];
+    if (w !== undefined) canvas.setAttribute('width',  w);
+    if (h !== undefined) canvas.setAttribute('height', h);
+    if (id) canvas.id = id;
     const ctx = canvas.getContext('2d');
     ctx.loop = Array.prototype.loop.bind([ctx]);
     return ctx;
