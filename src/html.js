@@ -23,7 +23,7 @@
   
   //str -> array
   addArrayMethod('qa', function(q) {
-    assert.single(q);
+    q = assert.single(q);
     const n = this.length;
     const z = [];
     let nz = 0;
@@ -289,7 +289,21 @@
     });
         
   }
+
+
+  //--------------- sketch ---------------// 
   
+  //[num, num, str] -> CanvasRenderingContext2D
+  addArrayMethod('sketch', function(w, h, id) {
+    w = assert.single(w);
+    h = assert.single(h);
+    id = assert.single(id);
+    const canvas = this.insert('canvas')[0];
+    const ctx = canvas.getContext('2d');
+    ctx.loop = Array.prototype.loop.bind([ctx]);
+    return ctx;
+  });
+
   
   module.exports = qa;
 
