@@ -293,18 +293,21 @@
 
   //--------------- sketch ---------------// 
   
-  //[num, num, str] -> CanvasRenderingContext2D
-  addArrayMethod('sketch', function(w, h, id) {
+  //[num, num] -> CanvasRenderingContext2D
+  addArrayMethod('sketch', function(w, h) {
     w = assert.single(w);
     h = assert.single(h);
-    id = '' + assert.single(id);
-    const canvas = this.insert('canvas')[0];
-    if (w !== undefined) canvas.setAttribute('width',  w);
-    if (h !== undefined) canvas.setAttribute('height', h);
-    if (id) canvas.id = id;
-    const ctx = canvas.getContext('2d');
-    ctx.loop = Array.prototype.loop.bind([ctx]);
-    return ctx;
+    const canvas = this.length ? this.slice(0,1).insert('canvas') : qa.create('canvas'),
+          canvasElm = canvas[0];
+    if (w !== undefined) canvasElm.setAttribute('width',  w);
+    if (h !== undefined) canvasElm.setAttribute('height', h);
+    const ctx = canvasElm.getContext('2d'),
+          boundLoop = Array.prototype.loop.bind([ctx]); 
+    ctx.loop = (...args) => {
+      boundLoop(...args);
+      return ctx;
+    };
+    return [canvas, ctx];
   });
 
   

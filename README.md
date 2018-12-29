@@ -207,6 +207,42 @@ Note: `on` and `off` call the native methods [EventTarget.addEventListener](http
 
 ---
 
+<a name="method_sketch" href="#method_sketch">#</a> **sketch:** `Array.prototype.sketch(width = 300, height = 150)`
+
+`sketch` creates a single canvas element of size `width`&times;`height`. If the calling array is non-empty, the canvas is inserted into the first entry of the calling array (which should be an HTML element).
+
+`sketch` returns a 2-entry array containing:
+
+* the canvas element &mdash; as a 1-entry array so that it can be used with other data-cube-html methods
+
+* a 2d drawing context (a `CanvasRenderingContext2D` object)
+
+The drawing context is _not_ wrapped in an array, and can be used in the normal way. However, the context does have an additional (instance-level) `loop` method; this is based on the data-cube [loop](https://github.com/gjmcn/data-cube/wiki/Entrywise#method_loop) method and enables array-oriented code to be used for drawing on the canvas. For example:
+
+```
+const [canvas, ctx] = qa('body').sketch();
+
+//standard canvas code: 40-by-20 yellow rectangle at x=0, y=0
+ctx.fillStyle = 'yellow';
+ctx.fillRect(0, 0, 40, 20);
+
+//array-oriented code: 3 rectangles with different colors, x-values and heights
+const color = ['red', 'green', 'blue'],
+      x = [50, 100, 150],
+      y = 0,
+      width = 40,
+      height = [40, 60, 80];
+      
+ctx.loop(
+  ['$fillStyle', color],
+  ['fillRect', x, y, width, height]
+);
+```
+
+The behavior of `loop` is well-suited to the state-based nature of the canvas. In the above example, `loop` sets the `fillStyle` to `'red'` and draws a rectangle using the first (or only) entries of `x`, `y`, `width` and `height`, then sets the `fillStyle` to `'green'` and draws a rectangle using the second (or only) entries of `x`, `y`, `width` and `height` and so on. Only one property and one method are used in this example, but `loop` can be passed any number of arguments.
+
+---
+
 ### Event Properties
 
 ---
