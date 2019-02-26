@@ -301,12 +301,8 @@
           canvasElm = canvas[0];
     if (w !== undefined) canvasElm.setAttribute('width',  w);
     if (h !== undefined) canvasElm.setAttribute('height', h);
-    const ctx = canvasElm.getContext('2d'),
-          boundLoop = Array.prototype.loop.bind([ctx]); 
-    ctx.loop = (...args) => {
-      boundLoop(...args);
-      return ctx;
-    };
+    const ctx = canvasElm.getContext('2d');
+    ctx.loop = Array.prototype.loop.bind([ctx]);
     return [canvas, ctx];
   });
 

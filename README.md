@@ -241,6 +241,8 @@ ctx.loop(
 
 The behavior of `loop` is well-suited to the state-based nature of the canvas. In the above example, `loop` sets the `fillStyle` to `'red'` and draws a rectangle using the first (or only) entries of `x`, `y`, `width` and `height`, then sets the `fillStyle` to `'green'` and draws a rectangle using the second (or only) entries of `x`, `y`, `width` and `height` and so on. Only one property and one method are used in this example, but `loop` can be passed any number of arguments.
 
+When used as a context method, `loop` returns a 1-entry cube containing the context.
+
 ---
 
 ### Event Properties
