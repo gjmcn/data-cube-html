@@ -154,8 +154,6 @@ Note: use the core Data-Cube method `prop` to get a property of each element, e.
 
 For each entry, set attribute/style `name` to `val`.
 
-If `val` is a (singleton) function, it is _not_ used as the new value. Instead, the function is passed the 'current entry' of the calling array, its vector index and the calling array; the returned value is used as the new attribute/style value.
-
 `val` is broadcast.
 
 Returns the calling array.

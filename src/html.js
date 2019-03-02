@@ -228,14 +228,8 @@
       var [val, valSingle] = polarize(val);
       const n = x.length;
       if (valSingle) {
-        if (typeof val === 'function') { 
-          if (mthd === '$style') { for (let j=0; j<n; j++) x[j].style[nm] = val(x[j], j, x) }
-          else                   { for (let j=0; j<n; j++) x[j].setAttribute(nm, val(x[j], j, x)) }
-        }
-        else {
-          if (mthd === '$style') { for (let j=0; j<n; j++) x[j].style[nm] = val }
-          else                   { for (let j=0; j<n; j++) x[j].setAttribute(nm, val) } 
-        }
+        if (mthd === '$style') { for (let j=0; j<n; j++) x[j].style[nm] = val }
+        else                   { for (let j=0; j<n; j++) x[j].setAttribute(nm, val) } 
       }
       else {
         if (val.length !== n) throw Error('shape mismatch');
@@ -249,6 +243,17 @@
     ['$style','$attr'].forEach(mthd => {
       addArrayMethod(mthd, function(nm, val) {
         return setInfo(this, mthd, nm, val);
+      });
+    });
+
+    //str, func -> array/cube
+    ['style', 'attr'].forEach(stem => {
+      addArrayMethod('$$' + stem, function(nm, f) {
+        f = assert.single(f);
+        const val = this[stem](nm);
+        for (let j=0, n=val.length; j<n; j++) val[j] = f(val[j]);
+        this['$' + stem](nm, val);
+        return this;
       });
     });
     
