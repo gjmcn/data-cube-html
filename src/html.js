@@ -226,7 +226,7 @@
     const setInfo = (x, mthd, nm, val) => {
       const origNm = nm,
             origVal = val;
-      if (this._b) callUpdate(this, '_b', mthd, [origNm, origVal]);
+      if (x._b) callUpdate(x, '_b', mthd, [origNm, origVal]);
       nm = assert.single(nm);
       var [val, valSingle] = polarize(val);
       const n = x.length;
@@ -239,7 +239,7 @@
         if (mthd === '$style') { for (let j=0; j<n; j++) x[j].style[nm] = val[j] }
         else                   { for (let j=0; j<n; j++) x[j].setAttribute(nm, val[j]) } 
       }
-      if (this._a) callUpdate(this, '_a', mthd, [origNm, origVal]);
+      if (x._a) callUpdate(x, '_a', mthd, [origNm, origVal]);
       return x;
     };
         
