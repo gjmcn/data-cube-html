@@ -160,9 +160,11 @@ Returns the calling array.
 
 Notes: 
 
-* If an error is thrown when settng an attribute/style, any already-made changes will persist.
+* If an error is thrown when settng an attribute/style (e.g. if an entry is `undefined`), any already-made changes will persist.
 
-* Use the core Data-Cube method `$prop` to set properties of elements, e.g. `x.$prop('innerHTML','hello')`.
+* `$attr` and `$style` trigger [updates](https://github.com/gjmcn/data-cube/wiki/Updates).
+
+* Use [$prop](https://github.com/gjmcn/data-cube/wiki/Entrywise#method_set_prop) to set properties of elements, e.g. `x.$prop('innerHTML','hello')`.
 
 ---
 
@@ -232,14 +234,16 @@ const color = ['red', 'green', 'blue'],
       height = [40, 60, 80];
       
 ctx.loop(
-  ['$fillStyle', color],
-  ['fillRect', x, y, width, height]
+  ['$fillStyle', color],             //set fillStyle property
+  ['fillRect', x, y, width, height]  //call fillRect method
 );
 ```
 
-The behavior of `loop` is well-suited to the state-based nature of the canvas. In the above example, `loop` sets the `fillStyle` to `'red'` and draws a rectangle using the first (or only) entries of `x`, `y`, `width` and `height`, then sets the `fillStyle` to `'green'` and draws a rectangle using the second (or only) entries of `x`, `y`, `width` and `height` and so on. Only one property and one method are used in this example, but `loop` can be passed any number of arguments.
+The behavior of `loop` is well-suited to the state-based nature of the canvas. In the above example, `loop` sets the `fillStyle` to `'red'` and draws a rectangle using the first (or only) entries of `x`, `y`, `width` and `height`, then sets the `fillStyle` to `'green'` and draws a rectangle using the second (or only) entries of `x`, `y`, `width` and `height` and so on.
 
-When used as a context method, `loop` returns a 1-entry cube containing the context.
+`loop` can be passed any number of arguments. To set a property, the first entry of the corresponding argument is the property name prefixed with `'$'` (as with `'$fillStyle'` in the example). If the first entry of an argument is a function (rather than a string property/method name), it is passed the context as its first argument; the other entries provide the additional arguments. 
+
+When called on a context, `loop` returns a 1-entry cube containing the context. When called on an array, `loop` iterates over entries of the calling array &mdash; so `loop` can draw different things on different canvases. If the calling array is comprised of a single context, this is broadcast resulting in the same behavior as calling `loop` on a context directly.
 
 ---
 
