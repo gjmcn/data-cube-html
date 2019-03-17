@@ -160,11 +160,17 @@ Returns the calling array.
 
 Notes: 
 
-* If an error is thrown when settng an attribute/style (e.g. if an entry is `undefined`), any already-made changes will persist.
-
-* `$attr` and `$style` trigger [updates](https://github.com/gjmcn/data-cube/wiki/Updates).
-
 * Use [$prop](https://github.com/gjmcn/data-cube/wiki/Entrywise#method_set_prop) to set properties of elements, e.g. `x.$prop('innerHTML','hello')`.
+
+* `$attr` and `$style` (and `$prop`) are setters and hence, trigger [updates](https://github.com/gjmcn/data-cube/wiki/Updates). Note that update functions belong to an array, not the elements. For example:
+
+  ```js
+  let paras = qa('p')
+    .$after(() => console.log('paras changed'));
+  
+  paras.$style('color', 'red');     //after-update function called
+  qa('p').$style('color', 'blue');  //no update functions called
+  ```
 
 ---
 
