@@ -1,13 +1,3 @@
-<hr><b>
-
-This module is at a very early stage of development:
-
-* the functions listed below have been implemented, but have not been thoroughly checked or tested
-
-* the behavior of existing functions may be modified; new functions will be added
-
-</b><hr>
-
 DOM manipulation functions and methods for [Data-Cube](https://github.com/gjmcn/data-cube).
 
 ## Install
@@ -160,6 +150,8 @@ Returns the calling array.
 
 Notes: 
 
+* If `$attr` or `$style` throws an error when attempting to set an attribute/style of an entry (e.g. because the entry is `undefined`), any already-made changes will persist.
+
 * Use [$prop](https://github.com/gjmcn/data-cube/wiki/Entrywise#method_set_prop) to set properties of elements, e.g. `x.$prop('innerHTML','hello')`.
 
 * `$attr` and `$style` (and `$prop`) are setters and hence, trigger [updates](https://github.com/gjmcn/data-cube/wiki/Updates). Note that update functions belong to an array, not the elements. For example:
@@ -171,6 +163,18 @@ Notes:
   paras.$style('color', 'red');     //after-update function called
   qa('p').$style('color', 'blue');  //no update functions called
   ```
+
+---
+
+<a name="method_set_set_attr" href="#method_set_set_attr">#</a><br>
+**$$attr:** `Array.prototype.$$attr(name, f)`<br>
+**$$style:** `Array.prototype.$$style(name, f)`
+
+Set attribute/style `name` using the function `f`.
+
+`x.$$attr(name, f)` is equivalent to `x.$attr(name, f(x.attr(name)))`.
+
+Returns the calling array.
 
 ---
 

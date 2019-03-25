@@ -253,10 +253,7 @@
     //str, func -> array/cube
     ['style', 'attr'].forEach(stem => {
       addArrayMethod('$$' + stem, function(nm, f) {
-        f = assert.single(f);
-        const val = this[stem](nm);
-        for (let j=0, n=val.length; j<n; j++) val[j] = f(val[j]);
-        this['$' + stem](nm, val);
+        this['$' + stem](nm, assert.single(f)(this[stem](nm)));
         return this;
       });
     });
