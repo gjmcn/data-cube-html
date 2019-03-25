@@ -65,7 +65,7 @@ Insert HTML or SVG elements as children of the elements in the calling array.
 
 * function: passed the corresponding entry of the calling array (the target element), the vector index of the entry and the calling array. The function should return an element or an array of elements; these are inserted into the target element.
 
-`n`is the number of elements to insert into the target element. `n` is only used when `elm` is a string.
+`n` is the number of elements to insert into the target element. `n` is only used when `elm` is a string.
 
 `posn` specifies where an element is to be inserted inside the target element:
 
