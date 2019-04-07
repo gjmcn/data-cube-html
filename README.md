@@ -89,6 +89,55 @@ Notes:
 
 ---
 
+<a name="method_fit" href="#method_fit">#</a> **fit:** `Array.prototype.fit(tag, data, join, ops)`
+
+Insert new elements as required to fit `data`. The calling array must be:
+
+* a singleton: `e.fit('div', x)` adds `x.n()` divs to the elements of `e` (i.e. one div for each row of the data)
+
+* or have `x.n()` entries: `e.fit('div', x)` adds one div to each element of `e`
+
+TAG MUST BE A SINGLETON
+
+JOIN HERE
+
+OPS HERE, inc
+-`use` option can only be used when `join` used????
+
+Notes:
+
+* Use `fit` when there is 'data' and `insert` otherwise. E.g.
+
+  ```js
+  qa('body')
+    .fit('section', x)   //add section for each row of x (the data)
+      .insert(['h1', 'p', 'a']);   //add h1, p and a to each section
+  ```
+
+* `fit` is a lightweight version of a [D3](https://d3js.org/) join &mdash; lightweight since Data-Cube selections use standard arrays, are not group-based and do not automatically bind data to elements. Typically we just refer to the data directly rather then binding:
+
+  ```js
+  qa('body').fit('div', x)
+    .$style('height', x.add('px'));
+  ```
+
+  However, it easy to bind data where more appropriate:
+
+  ```js
+  qa('body').fit('div', x)
+    .$prop('d', x)
+    .$$style('width', elm => elm.d + 'px');
+  ```
+
+  To use groups in Data-Cube, use e.g.
+
+  ```js
+  //returns array: entry for each g, each entry an array of circles
+  qa('g').map(g => g.qa('circle'));   
+  ```
+
+---
+
 <a name="method_remove" href="#method_remove">#</a> **remove:** `Array.prototype.remove()`
 
 Remove elements from the DOM.
