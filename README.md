@@ -89,60 +89,87 @@ Notes:
 
 ---
 
-<a name="method_fit" href="#method_fit">#</a> **fit:** `Array.prototype.fit(tag, data, join, ops)`
+<a name="method_encode" href="#method_encode">#</a><br>
+**encode:** `Array.prototype.encode(x, as)`<br>
+**encodeSVG:** `Array.prototype.encodeSVG(x, as)`
 
-Insert new elements as required to fit `data`. The calling array must be:
+Encode an array/cube `x` as HTML. The string `as` describes the encoding. The structure of `as` is described below, but it is easier to understand after a few examples:
 
-* a singleton: `e.fit('div', x)` adds `x.n()` divs to the elements of `e` (i.e. one div for each row of the data)
+1) Encode the entries of array `a` as `<span>` elements with class `red` in a `<p>` element:
 
-* or have `x.n()` entries: `e.fit('div', x)` adds one div to each element of `e`
+    ```js
+    let {p, spans} = qa.encode(a, 'base p/return=p, entry span.red/return=spans');
+    ```
 
-TAG MUST BE A SINGLETON
+   `p` will be a 1-entry vector containing a `<p>`, `spans` will be a vector of `<span>` elements with the same row keys as `a` (if they exist). 
 
-JOIN HERE
+2) Assuming `m` is a matrix and `myTable` is a `<table>`, encode the rows of `m` as `<tr>` elements and the entries as `<td>` elements:
 
-OPS HERE, inc
--`use` option can only be used when `join` used????
+    ```js
+    let {trs, tds} = myTable.encode(m, 'row tr/return=r, entry td/bind=d/return=c');
+    ```
 
-Notes:
+    `trs` will be a vector of `<tr>` elements (with an entry for each row of `m` and the same row keys as `m` (if they exist). `tds` will be a vector of the same length (and with the same keys); its entries will be 'row-vectors' of `<td>` elements with the same number of entries as `m` has columns (and the same columns keys as `m` if they exist).  The `bind` option indicates that data (in this case, entries of `m`) should be bound to elements (in this case `<td>` elements) with the property name `d`. 
 
-* Use `fit` when there is 'data' and `insert` otherwise. E.g.
+3) Assuming `x` is an array-of-arrays and `mySVG` is an `<svg>`, create a `<g>` element for each entry of `x` and a `<circle>` for each entry of the inner arrays:
 
-  ```js
-  qa('body')
-    .fit('section', x)   //add section for each row of x (the data)
-      .insert(['h1', 'p', 'a']);   //add h1, p and a to each section
-  ```
 
-* `fit` is a lightweight version of a [D3](https://d3js.org/) join &mdash; lightweight since Data-Cube selections use standard arrays, are not group-based and do not automatically bind data to elements. Typically we just refer to the data directly rather then binding:
+    ```js
+    let {circles} = mySVG.encodeSVG(x, 'entry g, entry circle/return=circles')
+    ```
 
-  ```js
-  qa('body').fit('div', x)
-    .$style('height', x.add('px'));
-  ```
+    `circles` will be an array of arrays; the length of the outer and inner arrays will match those of `x`.
 
-  However, it easy to bind data where more appropriate:
+`as` is  has the form:
 
-  ```js
-  qa('body').fit('div', x)
-    .$prop('d', x)
-    .$$style('width', elm => elm.d + 'px');
-  ```
+```js
+'dim tag.class0.class1.../option0=value0/option1=value1/...'
+```
 
-  To use groups in Data-Cube, use e.g.
+repeated as many times as required where:
 
-  ```js
-  //returns array: entry for each g, each entry an array of circles
-  qa('g').map(g => g.qa('circle'));   
-  ```
+* `dim` can be:
+  * `row`, `col`, `page`: dimension
+  * `entry`: individual entries
+  * `stay`: stay the current level &mdash; e.g. `myDiv.encode(x, 'entry p, stay b')` would be used to create `<p><b></b><p>` for each entry. Note that is `entry` was used instead of `stay` here, `encode` would expect the entries of `x` to be arrays.
+  * `root`:    HERE!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 
----
+* `tag` is the element type
+
+* `class0`, `class1`, ... are CSS class names to add the elements
+
+* `option0=value0`, `option1=value1`, ... are option-value pairs. The valid options are:
+
+  * | Option        | Value         | Description |
+    | ------------- |:-------------:| -----:|
+    | return        | right-aligned | $1600 |
+    | prefix        | centered      |   $12 |
+    | bind          | are neat      |    $1 |
+    | use           | are neat      |    $1 |
+
+use, bind, prefix, return
+
+-- calling and `as` must be singletons
+
+--'dim' can be row col page entry same
+
+---explain joins (prefix + indices/keys) and that existing elements can be used and are joined based on 
 
 <a name="method_remove" href="#method_remove">#</a> **remove:** `Array.prototype.remove()`
 
 Remove elements from the DOM.
 
 Returns the calling array &mdash; i.e. the removed elements.
+
+Notes:
+
+* comparisons to D3 - implicit join, entry and enter actions - limited in that cannot do anything different to entering than existing
+
+* only creates the elements; save them to variables to do something with them
+
+* for e.g. a matrix `x`, an encoding describes how to represent a multidimensional structure as hierarchical structure &mdash; so in example 2. above, `tds` is a 'vector-of-row-vectors` rather than a matrix. 
+
+* 'true dimensions' `row`, `col` and `page` are associated with subcubes whereas `entry` gets the entries inside &mdash; analogous to subcube methods versus entry methods.  
 
 ---
 
