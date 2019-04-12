@@ -90,86 +90,69 @@ Notes:
 ---
 
 <a name="method_encode" href="#method_encode">#</a><br>
-**encode:** `Array.prototype.encode(x, as)`<br>
-**encodeSVG:** `Array.prototype.encodeSVG(x, as)`
+**encode:** `Array.prototype.encode(x, as0, as1, as2, ...)`<br>
+**encodeSVG:** `Array.prototype.encodeSVG(x, as0, as1, as2, ...)`
 
-Encode an array/cube `x` as HTML. The string `as` describes the encoding. The structure of `as` is described below, but it is easier to understand after a few examples:
+Encode the array/cube `x` as HTML as described by the `as` arguments. The calling array must contain a single element into which the new elements are inserted.
 
-1) Encode the entries of array `a` as `<span>` elements with class `red` in a `<p>` element:
+The formal structure of an `as` argument is described after some examples:
 
-    ```js
-    let {p, spans} = qa.encode(a, 'base p/return=p, entry span.red/return=spans');
-    ```
-
-   `p` will be a 1-entry vector containing a `<p>`, `spans` will be a vector of `<span>` elements with the same row keys as `a` (if they exist). 
-
-2) Assuming `m` is a matrix and `myTable` is a `<table>`, encode the rows of `m` as `<tr>` elements and the entries as `<td>` elements:
+1) Encode the entries of array `a` as `<span>` elements with class `red`:
 
     ```js
-    let {trs, tds} = myTable.encode(m, 'row tr/return=r, entry td/bind=d/return=c');
+    let [spans] = qa.encode(a, 'entry:span.red');
     ```
 
-    `trs` will be a vector of `<tr>` elements (with an entry for each row of `m` and the same row keys as `m` (if they exist). `tds` will be a vector of the same length (and with the same keys); its entries will be 'row-vectors' of `<td>` elements with the same number of entries as `m` has columns (and the same columns keys as `m` if they exist).  The `bind` option indicates that data (in this case, entries of `m`) should be bound to elements (in this case `<td>` elements) with the property name `d`. 
+   `spans` is a vector of `<span>` elements with the same row keys as `a` (if they exist). 
 
-3) Assuming `x` is an array-of-arrays and `mySVG` is an `<svg>`, create a `<g>` element for each entry of `x` and a `<circle>` for each entry of the inner arrays:
-
+2) Encode the rows of matrix `m` as `<tr>` elements and the entries of `m` as `<td>` elements:
 
     ```js
-    let {circles} = mySVG.encodeSVG(x, 'entry g, entry circle/return=circles')
+    let [trs, tds] = myTable.encode(m, 'row:tr#r_', 'entry::td');
     ```
 
-    `circles` will be an array of arrays; the length of the outer and inner arrays will match those of `x`.
+    `trs` is a vector of `<tr>` elements with an entry for each row of `m` and the same row keys as `m` (if they exist). The `id` attributes of the `<tr>` elements are the row indices/keys of `m` prefixed with `r_`. `tds` is a vector with the same length and keys as `trs`; its entries are 'row-vectors' of `<td>` elements with the same number of entries as `m` has columns (and the same columns keys as `m` if they exist). Since `::` is used, the entries of `m` are attached to the `<td>` elements as `_data` properties. 
 
-`as` is  has the form:
+3) Encode the entries of the array-of-arrays `aa` as `<g>` elements and the entries of the inner arrays as `<circle>` elements:
+
+    ```js
+    let [, circles] = mySVG.encodeSVG(u, 'entry:g!', 'entry:circle');
+    ```
+
+    The `!` indicates that the array of `<g>` elements should not be included in the returned array &mdash; `null` is returned instead. `circles` is an array-of-arrays; the length of the outer and inner arrays will match those of `u`. 
+
+An `as` argument is a string of the form:
 
 ```js
-'dim tag.class0.class1.../option0=value0/option1=value1/...'
+'dim:tag[#prefix][.class0][.class1]...[!]'
 ```
 
-repeated as many times as required where:
+The components in square brackets are optional. The components are:
 
-* `dim` can be:
-  * `row`, `col`, `page`: dimension
-  * `entry`: individual entries
-  * `stay`: stay the current level &mdash; e.g. `myDiv.encode(x, 'entry p, stay b')` would be used to create `<p><b></b><p>` for each entry. Note that is `entry` was used instead of `stay` here, `encode` would expect the entries of `x` to be arrays.
-  * `root`:    HERE!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+* `dim`:
+  * `row`, `col`, `page`: dimension.
+  * `entry`: individual entries.
+  * `stay`: stay at the current level. E.g. `myDiv.encode(a, 'entry:p', 'stay:b')` would be used to create `<p><b></b><p>` for each entry of `a`. If `entry` was used instead of `stay`, `encode` would expect the entries of `a` to be arrays.
 
-* `tag` is the element type
+* Replace `:` with `::` to attach subcubes or entries to the corresponding elements as `_data` properties.
 
-* `class0`, `class1`, ... are CSS class names to add the elements
+* `tag`: element type.
 
-* `option0=value0`, `option1=value1`, ... are option-value pairs. The valid options are:
+* `#prefix`: if used, elements are given `id` attributes formed by prefixing the corresponding indices/keys of `x` with the given prefix.
 
-  * | Option        | Value         | Description |
-    | ------------- |:-------------:| -----:|
-    | return        | right-aligned | $1600 |
-    | prefix        | centered      |   $12 |
-    | bind          | are neat      |    $1 |
-    | use           | are neat      |    $1 |
+* `class0.class1...`: add CSS classes to elements.
 
-use, bind, prefix, return
+* `!`: return `null` rather then the new elements.
 
--- calling and `as` must be singletons
+`encode` and `encodeSVG` return an array.
 
---'dim' can be row col page entry same
-
----explain joins (prefix + indices/keys) and that existing elements can be used and are joined based on 
+---
 
 <a name="method_remove" href="#method_remove">#</a> **remove:** `Array.prototype.remove()`
 
 Remove elements from the DOM.
 
 Returns the calling array &mdash; i.e. the removed elements.
-
-Notes:
-
-* comparisons to D3 - implicit join, entry and enter actions - limited in that cannot do anything different to entering than existing
-
-* only creates the elements; save them to variables to do something with them
-
-* for e.g. a matrix `x`, an encoding describes how to represent a multidimensional structure as hierarchical structure &mdash; so in example 2. above, `tds` is a 'vector-of-row-vectors` rather than a matrix. 
-
-* 'true dimensions' `row`, `col` and `page` are associated with subcubes whereas `entry` gets the entries inside &mdash; analogous to subcube methods versus entry methods.  
 
 ---
 
