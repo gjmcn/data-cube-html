@@ -142,7 +142,61 @@
     };
     
   }
-      
+     
+  //--------------- encode ---------------//
+
+  {
+    
+    const asReg = new RegExp(
+      '(row|col|page|entry|stay)' +            //dim
+      '(\:{1,2})' +                            //colons
+      '([_a-zA-Z0-9-]+)' +                     //tag 
+      '(?:(\.-?[_a-zA-Z]+[_a-zA-Z0-9-]*)*)' +  //classes
+      '?:(#(\S+)?)'                            //prefix
+    );
+
+    addArrayMethod('encode', function(x, ...asArgs) {
+      if (this.length !== 1) throw Error('1-entry array expected');
+      const na = asArgs.length;
+      for (let i=0; i<na; i++) asArgs[i] = assert.string(assert.single(asArgs[i]));
+      const obj = {};
+      const frag = qa.fragment();
+      let data = x;      //data for current level
+      let elmts = this;  //elements for current level
+      for (let i=0; i<na; i++) {
+        const m = asArgs[i].match(asReg);
+        if (!m) throw Error(`argument ${i+1} invalid`);
+        const [, returnNull, dim, colons, tag, classes, prefix] = m;
+        if (i === 0) {
+          if (dim === 'row' || dim === 'col' || dim === 'page') {
+            data = data.map
+          }
+          else if (dim === 'entry') {
+            //can leave?
+          }  //else sim is 'stay' so leave data
+        
+          //here - use pack so can always just iterate over previous ...
+
+          
+          frag.insert()
+        }
+
+
+
+
+        if ()
+
+
+
+      }
+
+      //??ALLOW CONVERSION FUNCTION FOR ATTACHED DATA?
+
+      return obj;
+    });
+  
+  }
+
       
   //--------------- remove, raise, lower ---------------// 
     

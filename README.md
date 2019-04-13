@@ -90,8 +90,8 @@ Notes:
 ---
 
 <a name="method_encode" href="#method_encode">#</a><br>
-**encode:** `Array.prototype.encode(x, as0, as1, as2, ...)`<br>
-**encodeSVG:** `Array.prototype.encodeSVG(x, as0, as1, as2, ...)`
+**encode:** `Array.prototype.encode(x, as1, as2, as3, ...)`<br>
+**encodeSVG:** `Array.prototype.encodeSVG(x, as1, as2, as3, ...)`
 
 Encode the array/cube `x` as HTML as described by the `as` arguments. The calling array must contain a single element into which the new elements are inserted.
 
@@ -100,7 +100,7 @@ The formal structure of an `as` argument is described after some examples:
 1) Encode the entries of array `a` as `<span>` elements with class `red`:
 
     ```js
-    let [spans] = qa.encode(a, 'entry:span.red');
+    let [spans] = qa.encode(a, 'entry: span.red');
     ```
 
    `spans` is a vector of `<span>` elements with the same row keys as `a` (if they exist). 
@@ -108,7 +108,7 @@ The formal structure of an `as` argument is described after some examples:
 2) Encode the rows of matrix `m` as `<tr>` elements and the entries of `m` as `<td>` elements:
 
     ```js
-    let [trs, tds] = myTable.encode(m, 'row:tr#r_', 'entry::td');
+    let [trs, tds] = myTable.encode(m, 'row: tr#r_', 'entry::td');
     ```
 
     `trs` is a vector of `<tr>` elements with an entry for each row of `m` and the same row keys as `m` (if they exist). The `id` attributes of the `<tr>` elements are the row indices/keys of `m` prefixed with `r_`. `tds` is a vector with the same length and keys as `trs`; its entries are 'row-vectors' of `<td>` elements with the same number of entries as `m` has columns (and the same columns keys as `m` if they exist). Since `::` is used, the entries of `m` are attached to the `<td>` elements as `_data` properties. 
@@ -116,15 +116,15 @@ The formal structure of an `as` argument is described after some examples:
 3) Encode the entries of the array-of-arrays `aa` as `<g>` elements and the entries of the inner arrays as `<circle>` elements:
 
     ```js
-    let [, circles] = mySVG.encodeSVG(u, 'entry:g!', 'entry:circle');
+    let [, circles] = mySVG.encodeSVG(u, 'entry:g', 'entry:circle');
     ```
 
-    The `!` indicates that the array of `<g>` elements should not be included in the returned array &mdash; `null` is returned instead. `circles` is an array-of-arrays; the length of the outer and inner arrays will match those of `u`. 
+    The vector of `<g>` elements is not assigned to a variable. `circles` is a vector-of-vectors; the lengths of the outer and inner arrays match those of `u`. 
 
 An `as` argument is a string of the form:
 
 ```js
-'dim:tag[#prefix][.class0][.class1]...[!]'
+'dim:tag[.class0][.class1]...[#prefix]'
 ```
 
 The components in square brackets are optional. The components are:
@@ -138,11 +138,11 @@ The components in square brackets are optional. The components are:
 
 * `tag`: element type.
 
-* `#prefix`: if used, elements are given `id` attributes formed by prefixing the corresponding indices/keys of `x` with the given prefix.
-
 * `class0.class1...`: add CSS classes to elements.
 
-* `!`: return `null` rather then the new elements.
+* `#prefix`: if used, elements are given `id` attributes formed by prefixing the corresponding indices/keys of `x` with the given prefix.
+
+The components of an `as` argument _must_ be in the order shown above. For example, the id prefix cannot be before the classes.
 
 `encode` and `encodeSVG` return an array.
 
