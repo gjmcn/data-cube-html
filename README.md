@@ -219,8 +219,8 @@ Notes:
   let paras = qa('p')
     .$after(() => console.log('paras changed'));
   
-  paras.$style('color', 'red');     //after-update function called
-  qa('p').$style('color', 'blue');  //no update functions called
+  paras.$style('color', 'red');     //prints 'paras changed'
+  qa('p').$style('color', 'blue');  //qa('p') has no update functions
   ```
 
 ---
@@ -231,7 +231,9 @@ Notes:
 
 Set attribute/style `name` using the function `f`.
 
-`x.$$attr(name, f)` is equivalent to `x.$attr(name, f(x.attr(name)))`.
+`x.$$attr(name, f)` sets the attribute `name` of each entry `xi` to `f(xi, x)`.
+
+Note: the new values (the `f(xi, x)`) are computed first, then the `name` attributes/styles are set using `$attr`/`$style`. 
 
 Returns the calling array.
 

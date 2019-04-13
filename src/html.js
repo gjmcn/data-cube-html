@@ -253,7 +253,12 @@
     //str, func -> array/cube
     ['style', 'attr'].forEach(stem => {
       addArrayMethod('$$' + stem, function(nm, f) {
-        this['$' + stem](nm, assert.single(f)(this[stem](nm)));
+        assert.single(nm);  //not nm = ... since pass unchanged nm to $style/$attr
+        f = assert.single(f);
+        const n = this.length;
+        const results = new Array(n);
+        for (let j=0; j<n; j++) results[j] = f(this[j], this);
+        this['$' + stem](nm, results);
         return this;
       });
     });
