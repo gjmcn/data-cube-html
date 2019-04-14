@@ -149,7 +149,7 @@
     
     const asReg = new RegExp(
       '(row|col|page|entry|stay)' +            //dim
-      '(\:{1,2})' +                            //colons
+      '([\:\>])' +                             //attach
       '([_a-zA-Z0-9-]+)' +                     //tag 
       '(?:(\.-?[_a-zA-Z]+[_a-zA-Z0-9-]*)*)' +  //classes
       '?:(#(\S+)?)'                            //prefix
@@ -159,40 +159,53 @@
       if (this.length !== 1) throw Error('1-entry array expected');
       const na = asArgs.length;
       for (let i=0; i<na; i++) asArgs[i] = assert.string(assert.single(asArgs[i]));
-      const obj = {};
-      const frag = qa.fragment();
-      let data = x;      //data for current level
-      let elmts = this;  //elements for current level
+
+      //compute and store regex matches for all as arguments
+      const matches = new Array(na);
       for (let i=0; i<na; i++) {
         const m = asArgs[i].match(asReg);
         if (!m) throw Error(`argument ${i+1} invalid`);
-        const [, returnNull, dim, colons, tag, classes, prefix] = m;
-        if (i === 0) {
-          if (dim === 'row' || dim === 'col' || dim === 'page') {
-            data = data.map
-          }
-          else if (dim === 'entry') {
-            //can leave?
-          }  //else sim is 'stay' so leave data
-        
-          //here - use pack so can always just iterate over previous ...
-
-          
-          frag.insert()
-        }
-
-
-
-
-        if ()
-
-
-
+        const obj = {};
+        [, obj.dim, obj.attach, obj.tag, obj.classes, obj.prefix] = regMatch;
+        if (obj.classes) obj.classes = obj.classes.replace(/\./g, ' ')
+        obj.dimNum = helper.shortDimName.indexOf(dim);
+        matches[i] = obj;
       }
 
-      //??ALLOW CONVERSION FUNCTION FOR ATTACHED DATA?
+      //recursively add elements
+      const z = new Array(na);
+      for (let i=0; i<na; i++) z[i] = [];
+      const insertElmts = (data, elmts, level) => {
+        const n = data.length;  //elmts has same length
+        const match = matches[level];
+        for (let j=0; j<n; j++) {
+          const innerData = data[j];
+          if (match.dimNum > -1) {
+            if (!inner._data_cube) throw Error(`dim name: ${match.dim}, cube expected`);
+            innerData = innerData.pack(dimNum);
+          }
+          let innerElmts;
+          z[level].push(innerElmts = [elmts[j]].insert(tag, innerData.length));
+          if (attach === '>') innerElmts.$prop('_data', innerData);
+          if (classes) innerElmts.$attr('class', obj.classes);
+          if (prefix) {
+            
+          -- push to z
+          -- need correct keys on the outers
+          -- make sure no risk of converting x array -> cube
 
-      return obj;
+
+
+  
+      };
+      const frag = qa.fragment();
+      insertElmts([x], frag, 0);
+
+
+
+      //INSERT FRAG INTO 'CALLING ELEMENT'
+
+      return z;
     });
   
   }

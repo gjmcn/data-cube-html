@@ -90,61 +90,56 @@ Notes:
 ---
 
 <a name="method_encode" href="#method_encode">#</a><br>
-**encode:** `Array.prototype.encode(x, as1, as2, as3, ...)`<br>
-**encodeSVG:** `Array.prototype.encodeSVG(x, as1, as2, as3, ...)`
+**encode:** `Array.prototype.encode(x, as)`<br>
+**encodeSVG:** `Array.prototype.encodeSVG(x, as)`
 
-Encode the array/cube `x` as HTML as described by the `as` arguments. The calling array must contain a single element into which the new elements are inserted.
+Encode the array/cube `x` as HTML. The calling array must contain a single element into which the new elements are inserted.
 
-The formal structure of an `as` argument is described after some examples:
+`as` is an object. Each value is an HTML/SVG tag name (e.g. `'div'` or `'circle'`) or an array of such names. The object should contain one more of the properties: `row`, `col`, `page`, `inner1`, `inner2`, `inner3`, ...
 
-1) Encode the entries of array `a` as `<span>` elements with class `red`:
+`encode`/`encodeSVG` assumes `x` should be encoded hierarchically as rows &#8594; columns &#8594; pages and then if the entries of `x` are nested arrays, the `inner1`, `inner2`, ... properties of `as` can be used. Examples and notes:
 
-    ```js
-    let [spans] = qa.encode(a, 'entry: span.red');
-    ```
+* Insert a `<p>` for each row of the array/cube `a` into `elm`:
 
-   `spans` is a vector of `<span>` elements with the same row keys as `a` (if they exist). 
+  ```js
+  let obj1 = myDiv.encode(a, {row: 'p'};  //or use shorthand when only row is used:
+  let obj2 = myDiv.encode(a, 'p');
+  ```
 
-2) Encode the rows of matrix `m` as `<tr>` elements and the entries of `m` as `<td>` elements:
+  `obj1.row` and `obj2.row` are vectors the same length as `a` and have the same row keys and row label of `a` (if they exist).
 
-    ```js
-    let [trs, tds] = myTable.encode(m, 'row: tr#r_', 'entry::td');
-    ```
 
-    `trs` is a vector of `<tr>` elements with an entry for each row of `m` and the same row keys as `m` (if they exist). The `id` attributes of the `<tr>` elements are the row indices/keys of `m` prefixed with `r_`. `tds` is a vector with the same length and keys as `trs`; its entries are 'row-vectors' of `<td>` elements with the same number of entries as `m` has columns (and the same columns keys as `m` if they exist). Since `::` is used, the entries of `m` are attached to the `<td>` elements as `_data` properties. 
+* Encoding a matrix `m` in a table:
 
-3) Encode the entries of the array-of-arrays `aa` as `<g>` elements and the entries of the inner arrays as `<circle>` elements:
+  ```js
+  let {row: trs, col: tds} = myTable.encode(m, {row: 'tr', col: 'td');
+  ```
 
-    ```js
-    let [, circles] = mySVG.encodeSVG(u, 'entry:g', 'entry:circle');
-    ```
+  `trs` is a vector of `<tr>` elements with the same row keys and label as `m`. `tds` is a matrix of `<td>` elements with the same shape as `m` and the same row and column keys and labels.
 
-    The vector of `<g>` elements is not assigned to a variable. `circles` is a vector-of-vectors; the lengths of the outer and inner arrays match those of `u`. 
+* No elements are added for unused properties:
 
-An `as` argument is a string of the form:
+  ```js
+  let c = [2,3,4].rand();  //2 by 3 by 4 cube
+  let {row: gs, page: circles} = mySVG.encodeSVG(c, {row: 'g', page: 'circle'})
+  ```
 
-```js
-'dim:tag[.class0][.class1]...[#prefix]'
-```
+  `gs` is a vector of `<g>` elements. `circles` contains `<circle>` elements and has the same number of rows and pages as `c` (and would inherit the row and page keys and labels as `c` if they existed).
+  ```
 
-The components in square brackets are optional. The components are:
+* Encoding an array of arrays:
 
-* `dim`:
-  * `row`, `col`, `page`: dimension.
-  * `entry`: individual entries.
-  * `stay`: stay at the current level. E.g. `myDiv.encode(a, 'entry:p', 'stay:b')` would be used to create `<p><b></b><p>` for each entry of `a`. If `entry` was used instead of `stay`, `encode` would expect the entries of `a` to be arrays.
+  ```js
+  let aa = [[4,5], [5,6,7]]
+  let {row: gs, inner1: circles} = mySVG.encode(aa, {row: g, inner1: 'circle'})
+  ```
 
-* Replace `:` with `::` to attach subcubes or entries to the corresponding elements as `_data` properties.
+  !!!!!!!!HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-* `tag`: element type.
-
-* `class0.class1...`: add CSS classes to elements.
-
-* `#prefix`: if used, elements are given `id` attributes formed by prefixing the corresponding indices/keys of `x` with the given prefix.
-
-The components of an `as` argument _must_ be in the order shown above. For example, the id prefix cannot be before the classes.
-
-`encode` and `encodeSVG` return an array.
+--option to bind data? - and convert format? - e.g. use object rather than subcube
+--option to add classes?
+--example where pass 2 tag names in same property
+--switches to hierarchical, even though elements not returned that way
 
 ---
 
