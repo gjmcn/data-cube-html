@@ -2,7 +2,8 @@
   'use strict';
   
   const {
-    assert, addArrayMethod, polarize, toArray, def, callUpdate
+    assert, addArrayMethod, polarize, toArray, def, callUpdate,
+    ensureKey, ensureLabel, copyMap
   } = Array.prototype._helper;
   
   const createElmHTML = tag => document.createElement(tag);
@@ -145,68 +146,57 @@
      
   //--------------- encode ---------------//
 
-  {
-    
-    const asReg = new RegExp(
-      '(row|col|page|entry|stay)' +            //dim
-      '([\:\>])' +                             //attach
-      '([_a-zA-Z0-9-]+)' +                     //tag 
-      '(?:(\.-?[_a-zA-Z]+[_a-zA-Z0-9-]*)*)' +  //classes
-      '?:(#(\S+)?)'                            //prefix
-    );
-
-    addArrayMethod('encode', function(x, ...asArgs) {
-      if (this.length !== 1) throw Error('1-entry array expected');
-      const na = asArgs.length;
-      for (let i=0; i<na; i++) asArgs[i] = assert.string(assert.single(asArgs[i]));
-
-      //compute and store regex matches for all as arguments
-      const matches = new Array(na);
-      for (let i=0; i<na; i++) {
-        const m = asArgs[i].match(asReg);
-        if (!m) throw Error(`argument ${i+1} invalid`);
-        const obj = {};
-        [, obj.dim, obj.attach, obj.tag, obj.classes, obj.prefix] = regMatch;
-        if (obj.classes) obj.classes = obj.classes.replace(/\./g, ' ')
-        obj.dimNum = helper.shortDimName.indexOf(dim);
-        matches[i] = obj;
+  //array/cube, [str, str, ...] -> array
+  addArrayMethod('encode', function(x, ...as) {
+    if (this.length !== 1) throw Error('1-entry array expected');
+    const regex = /^([_a-zA-Z0-9-]+)((?:\.-?[_a-zA-Z]+[_a-zA-Z0-9-]*)?)$/;
+    const na = as.length,
+          tags = new Array(na),
+          classes = new Array(na);
+    for (let i=0; i<na; i++) {
+      arg = assert.single(na[i]);
+      if (arg) {
+        const match = ('' + arg).match(regex);
+        if (!match) throw Error(`argument ${i+1} invalid`);
+        tags[i] = match[1];
+        if (match[2]) classes[i] = match[2].replace(/\./g, ' ');
       }
+    }
 
-      //recursively add elements
-      const z = new Array(na);
-      for (let i=0; i<na; i++) z[i] = [];
-      const insertElmts = (data, elmts, level) => {
-        const n = data.length;  //elmts has same length
-        const match = matches[level];
-        for (let j=0; j<n; j++) {
-          const innerData = data[j];
-          if (match.dimNum > -1) {
-            if (!inner._data_cube) throw Error(`dim name: ${match.dim}, cube expected`);
-            innerData = innerData.pack(dimNum);
-          }
-          let innerElmts;
-          z[level].push(innerElmts = [elmts[j]].insert(tag, innerData.length));
-          if (attach === '>') innerElmts.$prop('_data', innerData);
-          if (classes) innerElmts.$attr('class', obj.classes);
-          if (prefix) {
-            
-          -- push to z
-          -- need correct keys on the outers
-          -- make sure no risk of converting x array -> cube
+    //copy keys and label on given dim
+    const copyExtras = (dim, a, b) => {
+      if (a._data_cube) {
+        if (a._k && a._k[dim]) {
+          ensureKey(b);
+          b._k[dim] = copyMap(a._k[dim]);
+        }
+        if (a._l && a._l[dim]) {
+          ensureLabel(b);
+          b._l[dim] = a._l[dim];
+        }
+      }
+    };
 
+    //add new elements
+    const frag = qa.fragment(),
+          elmts = frag,
+          z = new Array(na);
+    if (tags[0]) {  //add row elements
+      z[i] = elmts.insert(tag, x.n(0));
+      if (x._data_cube) copyExtras(0, x, z[i]);
+      if (classes[i]) z[i].$attr('class', classes[i]);
+    }
+    if (tags[1]) {  //add column elements
+      z[i]
 
+    }
 
-  
-      };
-      const frag = qa.fragment();
-      insertElmts([x], frag, 0);
+    --make sure no risk of converting x array->cube???
 
+    --remember that may have only one element if rows not us
 
-
-      //INSERT FRAG INTO 'CALLING ELEMENT'
-
-      return z;
-    });
+    //INSERT FRAG INTO 'CALLING ELEMENT'
+    return z;
   
   }
 

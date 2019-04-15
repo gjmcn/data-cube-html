@@ -90,56 +90,51 @@ Notes:
 ---
 
 <a name="method_encode" href="#method_encode">#</a><br>
-**encode:** `Array.prototype.encode(x, as)`<br>
-**encodeSVG:** `Array.prototype.encodeSVG(x, as)`
+**encode:** `Array.prototype.encode(x, r, c, p, i1, i2, i3, ...)`<br>
+**encodeSVG:** `Array.prototype.encodeSVG(x, r, c, p, i1, i2, i3, ...)`
 
-Encode the array/cube `x` as HTML. The calling array must contain a single element into which the new elements are inserted.
+Encode the array/cube `x` as HTML. The calling array must contain a single element &mdash; into which the new elements are inserted.
 
-`as` is an object. Each value is an HTML/SVG tag name (e.g. `'div'` or `'circle'`) or an array of such names. The object should contain one more of the properties: `row`, `col`, `page`, `inner1`, `inner2`, `inner3`, ...
+`x` is encoded hierarchically: rows &#8594; columns &#8594; pages (using the arguments `r`, `c` and `p` respectively) and then by the nesting of inner arrays (using the arguments `i1`, `i2`, `i3`, ...). Each argument (other than `x`) should be a tag name which may have class names appended (e.g. `'div'` or `'circle.red.small'`). Omit an argument or pass a falsy value to add no elements for the corresponding dimension or inner arrays.
 
-`encode`/`encodeSVG` assumes `x` should be encoded hierarchically as rows &#8594; columns &#8594; pages and then if the entries of `x` are nested arrays, the `inner1`, `inner2`, ... properties of `as` can be used. Examples and notes:
+`encode` and `encodeSVG` return an array with entries corresponding to the arguments `r`, `c`, .`p`, `i1`, ... Entries of the returned array are cubes containing the relevant new elements, or `undefined` if the corresponding argument was not used.
 
-* Insert a `<p>` for each row of the array/cube `a` into `elm`:
+Examples:
 
-  ```js
-  let obj1 = myDiv.encode(a, {row: 'p'};  //or use shorthand when only row is used:
-  let obj2 = myDiv.encode(a, 'p');
-  ```
-
-  `obj1.row` and `obj2.row` are vectors the same length as `a` and have the same row keys and row label of `a` (if they exist).
-
-
-* Encoding a matrix `m` in a table:
+* Insert a `<p>` with class `red` for each row of the array/cube `a`:
 
   ```js
-  let {row: trs, col: tds} = myTable.encode(m, {row: 'tr', col: 'td');
+  let [ps] = myDiv.encode(a, 'p.red');
   ```
 
-  `trs` is a vector of `<tr>` elements with the same row keys and label as `m`. `tds` is a matrix of `<td>` elements with the same shape as `m` and the same row and column keys and labels.
+  `ps` is a vector the same length as `a` and with the same row keys and row label (if they exist).
+
+* Encode matrix `m` as a table:
+
+  ```js
+  let [trs, tds] = myTable.encode(m, 'tr', 'td');
+  ```
+
+  `trs` is a vector containing a `<tr>` element for each row of `m` and the same row keys and label. `tds` is a matrix of `<td>` elements with the same shape as `m` and the same row and column keys and labels.
 
 * No elements are added for unused properties:
 
   ```js
-  let c = [2,3,4].rand();  //2 by 3 by 4 cube
-  let {row: gs, page: circles} = mySVG.encodeSVG(c, {row: 'g', page: 'circle'})
+  let c = [2, 3, 4].rand();  //2-by-3-by-4 cube
+  let [gs, , circles] = mySVG.encodeSVG(c, 'g', null, 'circle');
   ```
 
-  `gs` is a vector of `<g>` elements. `circles` contains `<circle>` elements and has the same number of rows and pages as `c` (and would inherit the row and page keys and labels as `c` if they existed).
-  ```
+  `gs` is a vector of `<g>` elements. `circles` contains `<circle>` elements and has the same number of rows and pages as `c` (and would inherit the row and page keys and labels of `c` if they existed).
 
-* Encoding an array of arrays:
+* Encoding an array-of-arrays:
 
   ```js
-  let aa = [[4,5], [5,6,7]]
-  let {row: gs, inner1: circles} = mySVG.encode(aa, {row: g, inner1: 'circle'})
+  let aa = [[4,5], [5,6,7]];
+  let [gs, , , circles] = mySVG.encode(aa, 'g', null, null, 'circle');
   ```
 
-  !!!!!!!!HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
---option to bind data? - and convert format? - e.g. use object rather than subcube
---option to add classes?
---example where pass 2 tag names in same property
---switches to hierarchical, even though elements not returned that way
+  Both `gs` and `circles` are 2-entry vectors. The entries of `circles` are 
+  arrays (the first has length 2, the second has length 3) whose entries are `<circle>` elements.
 
 ---
 
