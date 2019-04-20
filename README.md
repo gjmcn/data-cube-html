@@ -90,51 +90,62 @@ Notes:
 ---
 
 <a name="method_encode" href="#method_encode">#</a><br>
-**encode:** `Array.prototype.encode(x, r, c, p, i1, i2, i3, ...)`<br>
-**encodeSVG:** `Array.prototype.encodeSVG(x, r, c, p, i1, i2, i3, ...)`
+**encode:** `Array.prototype.encode(x, r, c, p, i)`<br>
+**encodeSVG:** `Array.prototype.encodeSVG(x, r, c, p, i)`
 
 Encode the array/cube `x` as HTML. The calling array must contain a single element &mdash; into which the new elements are inserted.
 
-`x` is encoded hierarchically: rows &#8594; columns &#8594; pages (using the arguments `r`, `c` and `p` respectively) and then by the nesting of inner arrays (using the arguments `i1`, `i2`, `i3`, ...). Each argument (other than `x`) should be a tag name which may have class names appended (e.g. `'div'` or `'circle.red.small'`). Omit an argument or pass a falsy value to add no elements for the corresponding dimension or inner arrays.
+`x` is encoded hierarchically: rows &#8594; columns &#8594; pages &#8594; inner arrays according to the arguments `r`, `c`, `p`, `i` respectively. Each of `r`, `c`, `p` and `i` should be a tag name which may have class names appended (e.g. `'div'` or `'circle.red.small'`). Omit an argument or pass a falsy value to add no elements for the corresponding dimension.
 
-`encode` and `encodeSVG` return an array with entries corresponding to the arguments `r`, `c`, .`p`, `i1`, ... Entries of the returned array are cubes containing the relevant new elements, or `undefined` if the corresponding argument was not used.
+`encode` and `encodeSVG` return a 4-entry array with entries corresponding to the arguments `r`, `c`, .`p` and `i`. Entries of the returned array are cubes containing the new elements, or `null` if the corresponding argument was not used.
 
-Examples:
+Notes:
 
-* Insert a `<p>` with class `red` for each row of the array/cube `a`:
-
-  ```js
-  let [ps] = myDiv.encode(a, 'p.red');
-  ```
-
-  `ps` is a vector the same length as `a` and with the same row keys and row label (if they exist).
-
-* Encode matrix `m` as a table:
+* The returned cubes reflect the structure of `x`. For example, if a matrix `m` is encoded as a table:
 
   ```js
-  let [trs, tds] = myTable.encode(m, 'tr', 'td');
+  let [trs, tds] = qa('#my-table').encode(m, 'tr', 'td');
   ```
 
-  `trs` is a vector containing a `<tr>` element for each row of `m` and the same row keys and label. `tds` is a matrix of `<td>` elements with the same shape as `m` and the same row and column keys and labels.
+  `trs` is a vector containing a `<tr>` element for each row of `m` and the same row keys and label as `m`. `tds` is a matrix of `<td>` elements with the same shape as `m` and the same row and column keys and labels.
 
-* No elements are added for unused properties:
+* Omitted dimensions need not appear 'at the end'. The following example creates 2 `<g>` elements, each containing 4 `<circle>` elements:
 
   ```js
-  let c = [2, 3, 4].rand();  //2-by-3-by-4 cube
-  let [gs, , circles] = mySVG.encodeSVG(c, 'g', null, 'circle');
+  let y = [2, 3, 4].rand();  //2-by-3-by-4 cube
+  let [gs, , circles] = qa('#my-svg').encodeSVG(y, 'g', null, 'circle');
   ```
 
-  `gs` is a vector of `<g>` elements. `circles` contains `<circle>` elements and has the same number of rows and pages as `c` (and would inherit the row and page keys and labels of `c` if they existed).
+  `circles` has 2 rows, 1 column and 4 pages.
 
-* Encoding an array-of-arrays:
+* If encoded, inner arrays must be standard arrays or vectors (the row keys and labels are inherited by the returned inner arrays). The following example creates 2 `<g>` elements, one containing  2 `<circle>` elements, the other containing 3:
 
   ```js
-  let aa = [[4,5], [5,6,7]];
-  let [gs, , , circles] = mySVG.encode(aa, 'g', null, null, 'circle');
+  let y = [[4,5], [6,7,8]];
+  let [gs, , , circles] = qa('#my-svg').encodeSVG(y, 'g', null, null, 'circle');
   ```
 
-  Both `gs` and `circles` are 2-entry vectors. The entries of `circles` are 
-  arrays (the first has length 2, the second has length 3) whose entries are `<circle>` elements.
+  `circles` is a 2-entry vector; the entries are vectors (of lengths 2 and 3) of `<circle>` elements.
+
+* Encoding dimensions of length 1 can be useful. The following example creates 3 `<p>` elements, each with a `<span>` inside:
+
+  ```js
+  let [ps, spans] = qa('#my-div').encode([6,7,8], 'p', 'span');
+  ```
+
+* Unlike [D3](https://en.wikipedia.org/wiki/D3.js), 'data' is not automatically bound to new elements. Use the data directly, or bind it manually:
+
+  ```js
+  let colors = ['red', 'green', 'blue'];
+  let [ps] = qa('body').encode(x, 'p');
+
+  //use data directly
+  ps.$style('color', colors);
+
+  //bind data
+  ps.$prop('_data', colors)
+    .$$style('color', p => p._data);
+  ```
 
 ---
 

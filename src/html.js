@@ -3,7 +3,7 @@
   
   const {
     assert, addArrayMethod, polarize, toArray, def, callUpdate,
-    ensureKey, ensureLabel, copyMap
+    ensureKey, ensureLabel, copyMap, fill
   } = Array.prototype._helper;
   
   const createElmHTML = tag => document.createElement(tag);
@@ -145,58 +145,110 @@
   }
      
   //--------------- encode ---------------//
-
-  //array/cube, [str, str, ...] -> array
-  addArrayMethod('encode', function(x, ...as) {
-    if (this.length !== 1) throw Error('1-entry array expected');
-    const regex = /^([_a-zA-Z0-9-]+)((?:\.-?[_a-zA-Z]+[_a-zA-Z0-9-]*)?)$/;
-    const na = as.length,
-          tags = new Array(na),
-          classes = new Array(na);
-    for (let i=0; i<na; i++) {
-      arg = assert.single(na[i]);
-      if (arg) {
-        const match = ('' + arg).match(regex);
-        if (!match) throw Error(`argument ${i+1} invalid`);
-        tags[i] = match[1];
-        if (match[2]) classes[i] = match[2].replace(/\./g, ' ');
-      }
-    }
-
-    //copy keys and label on given dim
-    const copyExtras = (dim, a, b) => {
-      if (a._data_cube) {
-        if (a._k && a._k[dim]) {
-          ensureKey(b);
-          b._k[dim] = copyMap(a._k[dim]);
-        }
-        if (a._l && a._l[dim]) {
-          ensureLabel(b);
-          b._l[dim] = a._l[dim];
+  {
+    
+    //array/cube, array/cube, bool, array -> array
+    const encode = (th, x, isSVG, tag) => {
+      
+      //prep
+      if (th.length !== 1) throw Error('1-entry array expected');
+      const regex = /^([_a-zA-Z0-9-]+)((?:\.-?[_a-zA-Z]+[_a-zA-Z0-9-]*)?)$/;
+      const na = tag.length,
+            tagNames = new Array(na),
+            classes = new Array(na);
+      for (let i=0; i<na; i++) {
+        arg = assert.single(tag[i]);
+        if (arg) {
+          const match = ('' + arg).match(regex);
+          if (!match) throw Error(`argument ${i+1} invalid`);
+          tagNames[i] = match[1];
+          if (match[2]) classes[i] = match[2].replace(/\./g, ' ');
         }
       }
+
+      //copy keys and labels
+      //num, array/cube, cube -> undef
+      const copyExtras = (maxDim, a, b) => {
+        const dims = tag.slice(0, maxDim + 1).which();
+        if (a._data_cube) {
+          if (a._k) {
+            for (let d of dims) {
+              if (a._k[d]) {
+                ensureKey(b);
+                b._k[d] = copyMap(a._k[d]);
+              }
+            }
+          }
+          if (a._l) {
+            for (let d of dims) {
+              if (a._l[d]) {
+                ensureLabel(b);
+                b._l[d] = a._l[d];
+              }
+            }
+          }
+        }
+      };
+
+      //add new row, col and page elements
+      const [nr, nc, np] = x._data_cube ? x.shape() : [x.length, 1, 1],
+            insrt = (isSVG ? 'insert' : 'insertSVG'),
+            z = fill(new Array(na), null);
+            frag = qa.fragment();
+      let elmts = frag;
+      if (tag[0]) {  //add row elements, parent always a single elmt
+        elmts = elmts[insrt](tagNames[0], nr).toCube();
+        if (classes[0]) elmts.$attr('class', classes[0]);
+        copyExtras(0, x, elemts);
+        z[0] = elmts;
+      }
+      if (tag[1]) {  //add column elements
+        elmts = elmts[insrt](tagNames[1], nc).toCube();
+        if (tag[0]) elmts = elmts.$shape([nc, nr]);
+        elmts = elmts.tp();
+        if (classes[1]) cols.$attr('class', classes[1]);
+        copyExtras(1, x, elemts);
+        z[1] = elmts;
+      }
+      if (tag[2]) {  //add page elements
+        elmts = elmts[insrt](tagNames[2], np).toCube();
+        if      (tag[0] && tag[1]) elmts = elmts.$shape([np,nr,nc]).tp([1,2,0]);
+        else if (tag[0])           elmts = elmts.$shape([np,nr]).tp([1,2,0]);
+        else if (tag[1])           elmts = elmts.$shape([np,nc]).tp([2,1,0]);
+        else                       elmts = elmts.tp([1,2,0]);
+        if (classes[2]) pages.$attr('class', classes[2]);
+        copyExtras(2, x, elemts);
+        z[2] = elmts;
+      }
+      if (tag[3]) {
+        if (elmts.length !== x.length) {
+          throw Error('shape mismatch, encode all non-singleton dimensions if encoding inner arrays');
+        }
+        const newElmts = x.copy(x._data_cube ? 'shell' : 'array');
+        for (let i=0, ne=x.length; i<ne; i++) {
+          const xi = x[i];
+          if (!Array.isArray(xi)) {
+            throw Error('array expected');
+          }
+          if (xi._data_cube && (xi._s[1] !== 1 || xi._s[2] !== 1)) {
+            throw Error('inner arrays must have 1 column and 1 page');
+          }
+          newElmts[i] = elmts[i][insrt](tagNames[3], xi.length).toCube();
+          copyExtras(0, xi, newElmts[i]);
+        }
+        z[3] = elmts = newElmts;
+      }
+      th[insrt](frag); 
+      return z;
     };
 
-    //add new elements
-    const frag = qa.fragment(),
-          elmts = frag,
-          z = new Array(na);
-    if (tags[0]) {  //add row elements
-      z[i] = elmts.insert(tag, x.n(0));
-      if (x._data_cube) copyExtras(0, x, z[i]);
-      if (classes[i]) z[i].$attr('class', classes[i]);
-    }
-    if (tags[1]) {  //add column elements
-      z[i]
-
-    }
-
-    --make sure no risk of converting x array->cube???
-
-    --remember that may have only one element if rows not us
-
-    //INSERT FRAG INTO 'CALLING ELEMENT'
-    return z;
+    //array/cube, str[, str, str, ...] -> cube
+    addArrayMethod('encode', function(x, ...tag) {
+      return encode(this, x, false, tag);
+    });
+    addArrayMethod('encodeSVG', function(x, ...tag) {
+      return encode(this, x, true, tag);
+    });
   
   }
 
