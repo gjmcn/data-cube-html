@@ -249,7 +249,7 @@
       return z;
     };
 
-    //array/cube, str[, str, str, str] -> cube
+    //array/cube [, str, str, str, str] -> cube
     addArrayMethod('encode', function(x, ...tag) {
       return encode(this, x, 'insert', tag);
     });
