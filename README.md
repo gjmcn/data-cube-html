@@ -93,11 +93,11 @@ Notes:
 **encode:** `Array.prototype.encode(x, r, c, p, i)`<br>
 **encodeSVG:** `Array.prototype.encodeSVG(x, r, c, p, i)`
 
-Encode the array/cube `x` as HTML. The calling array must contain a single element &mdash; into which the new elements are inserted.
+Encode the array/cube `x` as HTML or SVG. The calling array must contain a single element &mdash; into which the new elements are inserted.
 
-`x` is encoded hierarchically: rows &#8594; columns &#8594; pages &#8594; inner arrays according to the arguments `r`, `c`, `p`, `i` respectively. Each of `r`, `c`, `p` and `i` should be a tag name which may have class names appended (e.g. `'div'` or `'circle.red.small'`). Omit an argument or pass a falsy value to add no elements for the corresponding dimension.
+`x` is encoded hierarchically: rows &#8594; columns &#8594; pages &#8594; inner arrays, according to the arguments `r`, `c`, `p`, `i` respectively. Each of `r`, `c`, `p`, `i` should be a tag name which may have class names appended (e.g. `'div'` or `'circle.red.small'`). Omit an argument or pass a falsy value to add no elements for the corresponding dimension.
 
-`encode` and `encodeSVG` return a 4-entry array with entries corresponding to the arguments `r`, `c`, .`p` and `i`. Entries of the returned array are cubes containing the new elements, or `null` if the corresponding argument was not used.
+`encode` and `encodeSVG` return a 4-entry array with entries corresponding to the arguments `r`, `c`, `p`, `i`. Entries of the returned array are cubes containing the new elements, or `null` if the corresponding argument was not used.
 
 Notes:
 
@@ -107,25 +107,25 @@ Notes:
   let [trs, tds] = qa('#my-table').encode(m, 'tr', 'td');
   ```
 
-  `trs` is a vector containing a `<tr>` element for each row of `m` and the same row keys and label as `m`. `tds` is a matrix of `<td>` elements with the same shape as `m` and the same row and column keys and labels.
+  `trs` is a vector containing a `<tr>` element for each row of `m` and with the same row keys and row label as `m` (if they exist). `tds` is a matrix of `<td>` elements with the same shape as `m` and the same row and column keys and labels.
 
 * Omitted dimensions need not appear 'at the end'. The following example creates 2 `<g>` elements, each containing 4 `<circle>` elements:
 
   ```js
-  let y = [2, 3, 4].rand();  //2-by-3-by-4 cube
+  let y = [2, 3, 4].rand();  //2-by-3-by-4
   let [gs, , circles] = qa('#my-svg').encodeSVG(y, 'g', null, 'circle');
   ```
 
   `circles` has 2 rows, 1 column and 4 pages.
 
-* If encoded, inner arrays must be standard arrays or vectors (the row keys and labels are inherited by the returned inner arrays). The following example creates 2 `<g>` elements, one containing  2 `<circle>` elements, the other containing 3:
+* If encoded, inner arrays must be standard arrays or vectors (their row keys and labels are inherited by the returned inner arrays). The following example creates 2 `<g>` elements, one containing  2 `<circle>` elements, the other containing 3:
 
   ```js
   let y = [[4,5], [6,7,8]];
   let [gs, , , circles] = qa('#my-svg').encodeSVG(y, 'g', null, null, 'circle');
   ```
 
-  `circles` is a 2-entry vector; the entries are vectors (of lengths 2 and 3) of `<circle>` elements.
+  `circles` is a 2-entry vector; its entries are vectors (of lengths 2 and 3) of `<circle>` elements.
 
 * Encoding dimensions of length 1 can be useful. The following example creates 3 `<p>` elements, each with a `<span>` inside:
 
@@ -133,16 +133,18 @@ Notes:
   let [ps, spans] = qa('#my-div').encode([6,7,8], 'p', 'span');
   ```
 
-* Unlike [D3](https://en.wikipedia.org/wiki/D3.js), 'data' is not automatically bound to new elements. Use the data directly, or bind it manually:
+  `ps` and `spans` are 3-entry vectors of `<p>` and `<span>` elements respectively.
+
+* 'Bind' entries or subcubes of `x` manually if required:
 
   ```js
   let colors = ['red', 'green', 'blue'];
-  let [ps] = qa('body').encode(x, 'p');
+  let [ps] = qa('body').encode(colors, 'p');
 
-  //use data directly
+  //use colors directly
   ps.$style('color', colors);
 
-  //bind data
+  //bind entries of colors
   ps.$prop('_data', colors)
     .$$style('color', p => p._data);
   ```

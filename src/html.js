@@ -151,6 +151,7 @@
     const encode = (th, x, insrt, tag) => {
       
       //prep
+      x = toArray(x);
       if (th.length !== 1) throw Error('1-entry array expected');
       const regex = /^([_a-zA-Z0-9-]+)((?:\.-?[_a-zA-Z]+[_a-zA-Z0-9-]*)*)$/,
             na = Math.min(tag.length, 4),
