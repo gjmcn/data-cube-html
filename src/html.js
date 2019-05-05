@@ -227,7 +227,7 @@
         if (classes[2]) elmts.$attr('class', classes[2]);
         z[2] = elmts;
       }
-      if (tagNames[3]) {
+      if (tagNames[3]) {  //add inner elements
         if (elmts.length !== x.length) {
           throw Error('encoding inner arrays, must also encode all \'outer\' dimensions that do not have length 1');
         }
@@ -240,7 +240,7 @@
           if (xi._data_cube && (xi._s[1] !== 1 || xi._s[2] !== 1)) {
             throw Error('inner arrays must have 1 column and 1 page');
           }
-          newElmts[i] = elmts[i][insrt](tagNames[3], xi.length).toCube();
+          newElmts[i] = [elmts[i]][insrt](tagNames[3], xi.length).toCube();
           copyExtras(0, xi, newElmts[i]);
           if (classes[3]) newElmts[i].$attr('class', classes[3]);
         }
