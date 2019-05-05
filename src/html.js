@@ -229,7 +229,7 @@
       }
       if (tagNames[3]) {  //add inner elements
         if (elmts.length !== x.length) {
-          throw Error('encoding inner arrays, must also encode all \'outer\' dimensions that do not have length 1');
+          throw Error('when encoding inner arrays, encode \'outer\' dimensions that do not have length 1');
         }
         const newElmts = elmts.copy('shell');
         for (let i=0, ne=x.length; i<ne; i++) {
