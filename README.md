@@ -1,15 +1,13 @@
-DOM manipulation functions and methods for [Data-Cube](https://github.com/gjmcn/data-cube).
+DOM manipulation functions and methods for [Data-Cube](https://gjmcn.github.io/data-cube).
 
-## Install
-
-`npm install --save @gjmcn/data-cube-html`
-
-
-## Functions
 
 The module exports the function `qa`. If the module is loaded in a `<script>` tag, `qa` is a global variable.
 
-`qa` has various properties that are also functions.
+See the [Data-Cube plugins page](https://gjmcn.github.io/data-cube/index.html?plugins) for further usage instructions.
+
+---
+
+## Functions
 
 ---
 
