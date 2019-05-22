@@ -427,13 +427,14 @@
     h = assert.single(h);
     const canvas = this.length ? this.slice(0,1).insert('canvas') : qa.create('canvas'),
           canvasElm = canvas[0];
-    if (w !== undefined) canvasElm.style.width  = w + 'px';
-    if (h !== undefined) canvasElm.style.height = h + 'px';
+    if (w !== undefined) canvasElm.setAttribute('width',  w);
+    if (h !== undefined) canvasElm.setAttribute('height', h);
     const ctx = canvasElm.getContext('2d');
     ctx.loop = Array.prototype.loop.bind([ctx]);
     return [canvas, ctx];
   });
 
+  
   module.exports = qa;
 
 })();
