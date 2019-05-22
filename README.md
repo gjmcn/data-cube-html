@@ -289,7 +289,7 @@ Note: `on` and `off` call the native methods [EventTarget.addEventListener](http
 
 * a 2d drawing context (a [CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D) object)
 
-The drawing context is _not_ wrapped in an array, and can be used in the normal way. However, the context does have an additional (instance-level) `loop` method; this is based on the data-cube [loop](https://github.com/gjmcn/data-cube/wiki/Entrywise#method_loop) method and enables array-oriented code to be used for drawing on the canvas. For example:
+The drawing context is _not_ wrapped in an array, and can be used in the normal way. However, the context does have an additional (instance-level) `loop` method; this is based on the data-cube [loop](https://gjmcn.github.io/data-cube/index.html?entrywise#loop) method and enables array-oriented code to be used for drawing on the canvas. For example:
 
 ```js
 const [canvas, ctx] = qa('body').sketch();
