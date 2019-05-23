@@ -279,9 +279,19 @@ Note: `on` and `off` call the native methods [EventTarget.addEventListener](http
 
 ---
 
-<a name="method_sketch" href="#method_sketch">#</a> **sketch:** `Array.prototype.sketch(width = 300, height = 150)`
+<a name="method_sketch" href="#method_sketch">#</a> **sketch:** `Array.prototype.sketch(width = 300, height = 150, scale)`
 
-`sketch` creates a single canvas element of size `width`&times;`height`. If the calling array is non-empty, the canvas is inserted into the first entry of the calling array (which should be an HTML element).
+`sketch` creates a single canvas element. If the calling array is non-empty, the canvas is inserted into the first entry of the calling array (which should be an HTML element).
+
+If `scale` is truthy, the canvas is scaled to avoid blur:
+  
+  * the width and height styles are set to `width + 'px'` and `height + 'px'` respectively
+  
+  * the width and height attributes are set to `width * devicePixelRatio` and `height * devicePixelRatio` respectively
+  
+  * the scale of the returned context (see below) is set to `devicePixelRatio` (i.e. `ctx.scale(devicePixelRatio, devicePixelRatio)`)
+
+If `scale` is falsy, the width and height attributes are set to `width` and `height` respectively; the width and height styles are not set.
 
 `sketch` returns a 2-entry array containing:
 

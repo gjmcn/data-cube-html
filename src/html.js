@@ -421,16 +421,27 @@
 
   //--------------- sketch ---------------// 
   
-  //[num, num] -> CanvasRenderingContext2D
-  addArrayMethod('sketch', function(w, h) {
-    w = assert.single(w);
-    h = assert.single(h);
+  //[num, num, bool] -> CanvasRenderingContext2D
+  addArrayMethod('sketch', function(w, h, scale) {
+    w = def(assert.single(w), 300);
+    h = def(assert.single(h), 150);
+    scale = assert.single(scale);
     const canvas = this.length ? this.slice(0,1).insert('canvas') : qa.create('canvas'),
-          canvasElm = canvas[0];
-    if (w !== undefined) canvasElm.setAttribute('width',  w);
-    if (h !== undefined) canvasElm.setAttribute('height', h);
+          canvasElm = canvas[0],
+          dpr = window.devicePixelRatio;
+    if (scale) {
+      canvasElm.style.width  = w + 'px';
+      canvasElm.style.height = h + 'px';
+      canvasElm.width  = w * dpr;
+      canvasElm.height = h * dpr;
+    }
+    else {
+      canvasElm.width  = w;
+      canvasElm.height = h;
+    }
     const ctx = canvasElm.getContext('2d');
     ctx.loop = Array.prototype.loop.bind([ctx]);
+    if (scale) ctx.scale(dpr, dpr);
     return [canvas, ctx];
   });
 
