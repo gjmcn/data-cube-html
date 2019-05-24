@@ -152,12 +152,28 @@
       
       //prep
       if (th.length !== 1) throw Error('1-entry array expected');
-      x = toArray(x);
-      const shape = x._data_cube ? x.shape() : [x.length, 1, 1];
-      [nr, nc, np] = shape,
+      let shape, expanding;
+      if (typeof x === 'object' && x !== null && x.expand === expand) {
+        x = toArray(x.x);
+        expanding = true;
+        shape = [1, 1, 1];
+        const nx = x.length;
+        if (nx > 3) throw Error('shape cannot have more than 3 entries');
+        for (let i=0; i<nx; i++) {
+          shape[i] = x[i] === undefined ? 1 : assert.nonNegInt(x[i]);
+        }
+      }
+      else {
+        x = toArray(x);
+        shape = x._data_cube ? x.shape() : [x.length, 1, 1];
+      }
+      const [nr, nc, np] = shape;
       tags = tags.slice(0,4).map((ti, i) => {
         if (!ti) return null;
-        if (i === 3) return '' + assert.single(ti);
+        if (i === 3) {
+          if (expanding) throw Error('cannot encode inner arrays with expand methods');
+          return '' + assert.single(ti);
+        }
         ti = toArray(ti);
         if (ti.length === 1) {
           if (!ti[0]) return null;
@@ -168,7 +184,7 @@
 
       //copy extras: number, array/cube, cube -> undef
       const copyExtras = (dim, a, b) => {
-        if (a._data_cube) {
+        if (!expanding && a._data_cube) {
           if (a._k && a._k[dim]) {
             ensureKey(b);
             b._k[dim] = copyMap(a._k[dim]);
@@ -248,12 +264,19 @@
       return z;
     };
 
-    //array/cube [, str, str, str, str] -> cube
+    //[*, *, *, *, *] -> cube
     addArrayMethod('encode', function(x, ...tags) {
       return encode(this, x, false, tags);
     });
     addArrayMethod('encodeSVG', function(x, ...tags) {
       return encode(this, x, true, tags);
+    });
+    const expand = Symbol();
+    addArrayMethod('expand', function(x, ...tags) {
+      return encode(this, {x, expand}, false, tags);
+    });
+    addArrayMethod('expandSVG', function(x, ...tags) {
+      return encode(this, {x, expand}, true, tags);
     });
   
   }

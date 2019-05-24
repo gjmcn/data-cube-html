@@ -134,6 +134,22 @@ Notes:
 
 ---
 
+<a name="method_expand" href="#method_expand">#</a><br>
+**expand:** `Array.prototype.expand(x, r, c, p)`<br>
+**expandSVG:** `Array.prototype.expandSVG(x, r, c, p)`
+
+The expand methods behave like the [encode methods](#method_encode) except that `x` is the shape of a cube rather than an actual cube. For example:
+
+```js
+let [trs, tds] = qa('#my-table').expand([4, 2], 'tr', 'td');
+```
+
+returns a vector of 4 `tr` elements (`trs`) and a 4-by-2 matrix of `td` elements (`tds`).
+
+Since expand methods are only given shape information, inner arrays cannnot be encoded and the returned cubes have no keys or labels.
+
+---
+
 <a name="method_remove" href="#method_remove">#</a> **remove:** `Array.prototype.remove()`
 
 Remove elements from the DOM.
