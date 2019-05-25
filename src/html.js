@@ -156,24 +156,22 @@
       if (typeof x === 'object' && x !== null && x.expand === expand) {
         x = toArray(x.x);
         expanding = true;
-        shape = [1, 1, 1];
-        const nx = x.length;
-        if (nx > 3) throw Error('shape cannot have more than 3 entries');
-        for (let i=0; i<nx; i++) {
-          shape[i] = x[i] === undefined ? 1 : assert.nonNegInt(x[i]);
+        shape = new Array(3);
+        if (x.length > 3) throw Error('shape cannot have more than 3 entries');
+        for (let i=0; i<3; i++) {
+          shape[i] = (x[i] === undefined ? 1 : assert.nonNegInt(x[i]));
         }
       }
       else {
         x = toArray(x);
-        shape = x._data_cube ? x.shape() : [x.length, 1, 1];
+        shape = (x._data_cube ? x.shape() : [x.length, 1, 1]);
       }
-      const [nr, nc, np] = shape;
-      tags = tags.slice(0,4).map((ti, i) => {
-        if (!ti) return null;
+      tags = tags.slice(0, expanding ? 3 : 4).map((ti, i) => {
         if (i === 3) {
-          if (expanding) throw Error('cannot encode inner arrays with expand methods');
-          return '' + assert.single(ti);
+          ti = assert.single(ti);
+          return ti ? '' + ti : null;
         }
+        if (!ti) return null;
         ti = toArray(ti);
         if (ti.length === 1) {
           if (!ti[0]) return null;
@@ -194,7 +192,7 @@
             b._l[dim] = a._l[dim];
           }
         }
-      }
+      };
 
       //add elements
       const insert = `insert${isSvg ? 'SVG' : ''}`;
@@ -202,11 +200,12 @@
       const addElmts = (elmts, tagName, n) => {
         return tagName.length === 1
           ? elmts[insert]('' + tagName[0], n)
-          : elmts[insert](() => qa[create](tagName)); 
+          : elmts[insert](() => qa[create](tagName));
       };
 
       //create the new elements
-      const z = [null, null, null, null];
+      const [nr, nc, np] = shape;
+      const z = (new Array(expanding ? 3 : 4)).fill(null);
       const frag = qa.fragment();
       let elmts = frag;
       if (tags[0]) {  //add row elements
@@ -245,14 +244,14 @@
       }
       if (tags[3]) {  //add inner elements
         if (elmts.length !== x.length) {
-          throw Error('encoding inner arrays, must encode outer dimensions that do not have length 1');
+          throw Error('when encoding inner arrays, must encode outer dimensions that do not have length 1');
         }
         const newElmts = elmts.copy('shell');
         for (let i=0, ne=x.length; i<ne; i++) {
           const xi = x[i];
-          if (!Array.isArray(xi)) throw Error('inner array expected');
-          newElmts[i] = [elmts[i]][insert](tags[3], xi.length);
-          if (xi._data_cube) {
+          const xiIsArray = Array.isArray(xi);
+          newElmts[i] = [elmts[i]][insert](tags[3], xiIsArray ? xi.length : 1);
+          if (xiIsArray && xi._data_cube) {
             newElmts[i].$shape(xi.shape());
             copyKey(xi, newElmts[i]);
             copyLabel(xi, newElmts[i]);
@@ -264,13 +263,15 @@
       return z;
     };
 
-    //[*, *, *, *, *] -> cube
+    //[*, *, *, *, str] -> cube
     addArrayMethod('encode', function(x, ...tags) {
       return encode(this, x, false, tags);
     });
     addArrayMethod('encodeSVG', function(x, ...tags) {
       return encode(this, x, true, tags);
     });
+
+    //[*, *, *, *] -> cube
     const expand = Symbol();
     addArrayMethod('expand', function(x, ...tags) {
       return encode(this, {x, expand}, false, tags);

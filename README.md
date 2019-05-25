@@ -11,13 +11,13 @@ See the [Data-Cube plugins page](https://gjmcn.github.io/data-cube/index.html?pl
 
 ---
 
-<a name="function_qa" href="#function_qa">#</a> **qa:** `qa(sel)`
+<a id="function_qa" href="#function_qa">#</a> **qa:** `qa(sel)`
 
 Returns an array of elements that match the CSS selector string `sel`.
 
 ---
 
-<a name="function_create" href="#function_create">#</a><br>
+<a id="function_create" href="#function_create">#</a><br>
 **create:** `qa.create(elm, n = 1)`<br>
 **createSVG:** `qa.createSVG(elm, n = 1)`
 
@@ -31,7 +31,7 @@ Returns an array containing the new elements.
 
 ---
 
-<a name="function_fragment" href="#function_fragment">#</a> **fragment:** `qa.fragment(n = 1)`
+<a id="function_fragment" href="#function_fragment">#</a> **fragment:** `qa.fragment(n = 1)`
 
 Returns an array of `n` new document fragments.
 
@@ -39,17 +39,17 @@ Returns an array of `n` new document fragments.
 
 ## Array Methods
 
-Note: unlike core Data-Cube methods, HTML methods do not convert the calling array to a cube.
+Unlike standard Data-Cube methods, HTML methods _do not_ convert the calling array to a cube. Also, HTML methods that return a new array, typically return a standard array rather than a cube.
 
 ---
 
-<a name="method_qa" href="#method_qa">#</a> **qa:** `Array.prototype.qa(sel)`
+<a id="method_qa" href="#method_qa">#</a> **qa:** `Array.prototype.qa(sel)`
 
 Like the function `qa`, but the returned array only includes elements that are descendents of at least one entry of the calling array.
 
 ---
 
-<a name="method_insert" href="#method_insert">#</a><br>
+<a id="method_insert" href="#method_insert">#</a><br>
 **insert:** `Array.prototype.insert(elm, n = 1, posn = 'end')`<br>
 **insertSVG:** `Array.prototype.insertSVG(elm, n = 1, posn = 'end')`
 
@@ -87,21 +87,21 @@ Notes:
 
 ---
 
-<a name="method_encode" href="#method_encode">#</a><br>
+<a id="method_encode" href="#method_encode">#</a><br>
 **encode:** `Array.prototype.encode(x, r, c, p, i)`<br>
 **encodeSVG:** `Array.prototype.encodeSVG(x, r, c, p, i)`
 
-Encode the array/cube `x` as HTML or SVG. The calling array must contain a single element &mdash; into which the new elements are inserted.
+Encode `x` as HTML or SVG. The calling array must contain a single element &mdash; into which the new elements are inserted.
 
 `x` is encoded hierarchically: rows &#8594; columns &#8594; pages &#8594; inner arrays, according to the arguments `r`, `c`, `p`, `i` respectively:
 
-  * Each of `r`, `c`, `p` should be a tag name or an array of tag names whose number of entries is equal to the length of the dimension being encoded.
+  * Each of `r`, `c`, `p` is a tag name or an array of tag names whose number of entries is equal to the length of the dimension of `x` being encoded.
   
-  * `i` must be a single tag name &mdash; i.e. the same tag name must be used for all entries of inner arrays.
+  * `i` is a single tag name &mdash; i.e. the same tag name is used for all inner arrays. (Note: if an entry of `x` is not an array, it is encoded as a single element).
   
-  * Omit or pass a falsy value for any of `r`, `c`, `p`, `i` to add no elements for the corresponding dimension.
+  * Omit any of `r`, `c`, `p`, `i` (or pass a falsy value) to skip the corresponding dimension.
 
-`encode` and `encodeSVG` return a 4-entry array with entries corresponding to the arguments `r`, `c`, `p`, `i`. Entries of the returned array are cubes containing the new elements, or `null` if the corresponding argument was not used.
+`encode` and `encodeSVG` return a 4-entry array with entries corresponding to the arguments `r`, `c`, `p`, `i`. Each entry is a cube containing new elements, or `null` if the corresponding argument was not used.
 
 Notes:
 
@@ -113,14 +113,14 @@ Notes:
 
   `trs` is a vector containing a `<tr>` element for each row of `m` and with the same row keys and row label as `m` (if they exist). `tds` is a matrix of `<td>` elements with the same shape as `m` and the same row and column keys and labels.
 
-* Omitted dimensions need not appear 'at the end'. The following example creates 2 `<g>` elements, each containing a `<text>` and a `<circle>`:
+* Omitted dimensions need not appear 'at the end'. The following example creates 4 `<g>` elements, each containing a `<text>` and a `<circle>`:
 
   ```js
-  let y = [4, 3, 2].rand();  //4-by-3-by-2
+  let y = [4, 3, 2].cube();  //4-by-3-by-2
   let [gs, , elmts] = qa('#my-svg').encodeSVG(y, 'g', null, ['text', 'circle']);
   ```
 
-  `elmts` has 4 rows, 1 column and 2 pages (the first page contains `<text>` elements, the second `<circle>` elements).
+  `elmts` has 4 rows, 1 column and 2 pages: the first page contains `<text>` elements, the second contains `<circle>` elements. (Note that the columns argument (`c`) of `encodeSVG` is `null`, so `elmts` is given a single column.)
 
 * Encoding dimensions of length 1 can be useful. The following example creates 3 `<p>` elements, each with a `<span>` inside:
 
@@ -134,11 +134,11 @@ Notes:
 
 ---
 
-<a name="method_expand" href="#method_expand">#</a><br>
+<a id="method_expand" href="#method_expand">#</a><br>
 **expand:** `Array.prototype.expand(x, r, c, p)`<br>
 **expandSVG:** `Array.prototype.expandSVG(x, r, c, p)`
 
-The expand methods behave like the [encode methods](#method_encode) except that `x` is the shape of a cube rather than an actual cube. For example:
+The expand methods behave like the [encode methods](#method_encode) except that `x` is the _shape_ of a cube rather than an actual cube. For example:
 
 ```js
 let [trs, tds] = qa('#my-table').expand([4, 2], 'tr', 'td');
@@ -146,11 +146,11 @@ let [trs, tds] = qa('#my-table').expand([4, 2], 'tr', 'td');
 
 returns a vector of 4 `tr` elements (`trs`) and a 4-by-2 matrix of `td` elements (`tds`).
 
-Since expand methods are only given shape information, inner arrays cannnot be encoded and the returned cubes have no keys or labels.
+Expand methods cannot encode inner arrays. Hence, these methods do not take an `i` argument and return a 3-entry array.
 
 ---
 
-<a name="method_remove" href="#method_remove">#</a> **remove:** `Array.prototype.remove()`
+<a id="method_remove" href="#method_remove">#</a> **remove:** `Array.prototype.remove()`
 
 Remove elements from the DOM.
 
@@ -158,7 +158,7 @@ Returns the calling array &mdash; i.e. the removed elements.
 
 ---
 
-<a name="method_raise" href="#method_raise">#</a><br>
+<a id="method_raise" href="#method_raise">#</a><br>
 **raise:** `Array.prototype.raise()`<br>
 **lower:** `Array.prototype.lower()`
 
@@ -168,7 +168,7 @@ Returns the calling array &mdash; i.e. the moved elements.
 
 ---
 
-<a name="method_children" href="#method_children">#</a> **children:** `Array.prototype.children()`
+<a id="method_children" href="#method_children">#</a> **children:** `Array.prototype.children()`
 
 Children of all entries in the calling array.
 
@@ -176,7 +176,7 @@ Returns a new array.
 
 ---
 
-<a name="method_parent" href="#method_parent">#</a><br>
+<a id="method_parent" href="#method_parent">#</a><br>
 **parent:** `Array.prototype.parent()`<br>
 **firstChild:** `Array.prototype.firstChild()`<br>
 **lastChild:** `Array.prototype.lastChild()`
@@ -187,7 +187,7 @@ Returns a new array.
 
 ---
 
-<a name="method_attr" href="#method_attr">#</a><br>
+<a id="method_attr" href="#method_attr">#</a><br>
 **attr:** `Array.prototype.attr(name)`<br>
 **style:** `Array.prototype.style(name)`
 
@@ -199,7 +199,7 @@ Note: use the core Data-Cube method `prop` to get a property of each element, e.
 
 ---
 
-<a name="method_set_attr" href="#method_set_attr">#</a><br>
+<a id="method_set_attr" href="#method_set_attr">#</a><br>
 **$attr:** `Array.prototype.$attr(name, val)`<br>
 **$style:** `Array.prototype.$style(name, val)`
 
@@ -227,7 +227,7 @@ Notes:
 
 ---
 
-<a name="method_set_set_attr" href="#method_set_set_attr">#</a><br>
+<a id="method_set_set_attr" href="#method_set_set_attr">#</a><br>
 **$$attr:** `Array.prototype.$$attr(name, f)`<br>
 **$$style:** `Array.prototype.$$style(name, f)`
 
@@ -241,7 +241,7 @@ Returns the calling array.
 
 ---
 
-<a name="method_has_attr" href="#method_has_attr">#</a><br>
+<a id="method_has_attr" href="#method_has_attr">#</a><br>
 **hasAttr:** `Array.prototype.hasAttr(name)`<br>
 **hasClass:** `Array.prototype.hasClass(name)`<br>
 
@@ -249,18 +249,32 @@ Returns a new array with Boolean entries. An entry is `true` if the correspondin
 
 ---
 
-<a name="method_remove_attr" href="#method_remove_attr">#</a><br>
+<a id="method_remove_attr" href="#method_remove_attr">#</a><br>
 **removeAttr:** `Array.prototype.removeAttr(name)`<br>
 **addClass:** `Array.prototype.addClass(name)`<br>
 **removeClass:** `Array.prototype.removeClass(name)`
 
 Remove attribute `name`, add class `name` or remove class `name` from each entry of the calling array.
 
+`name` is broadcast.
+
 Returns the calling array.
+
+Note: these methods cannot add or remove multiple classes or attributes from an element in a single call. For example, to add classes `a` and `b` to all elements of an array `x`, `addClass` must be called twice:
+
+```js
+x.addClass('a').addClass('b');
+```
+
+Alternatively, set the class attribute (which removes any existing classes):
+
+```js
+x.$attr('class', 'a b');
+```
 
 ---
 
-<a name="method_on" href="#method_on">#</a><br>
+<a id="method_on" href="#method_on">#</a><br>
 **on:** `Array.prototype.on(type, listener, useCapture = false)`<br>
 **off:** `Array.prototype.off(type, listener, useCapture = false)`
 
@@ -280,7 +294,7 @@ Note: `on` and `off` call the native methods [EventTarget.addEventListener](http
 
 ---
 
-<a name="method_sketch" href="#method_sketch">#</a> **sketch:** `Array.prototype.sketch(width = 300, height = 150, scale)`
+<a id="method_sketch" href="#method_sketch">#</a> **sketch:** `Array.prototype.sketch(width = 300, height = 150, scale)`
 
 `sketch` creates a single canvas element. If the calling array is non-empty, the canvas is inserted into the first entry of the calling array (which should be an HTML element).
 
@@ -296,7 +310,7 @@ If `scale` is falsy, the width and height attributes are set to `width` and `hei
 
 `sketch` returns a 2-entry array containing:
 
-* the canvas element &mdash; as a 1-entry array so that it can be used with other data-cube-html methods
+* the canvas element &mdash; as a 1-entry array so that it can use Data-Cube methods
 
 * a 2d drawing context (a [CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D) object)
 
@@ -334,7 +348,7 @@ When called on a context, `loop` returns a 1-entry cube containing the context. 
 
 ---
 
-<a name="property_me" href="#property_me">#</a> **me:** `Event.me`
+<a id="property_me" href="#property_me">#</a> **me:** `Event.me`
 
 A 1-entry array containing the element that dispatched the event. This is simply `Event.target` wrapped in an array so that it can be used with Data-Cube methods, e.g.
 
