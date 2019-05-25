@@ -97,7 +97,7 @@ Encode `x` as HTML or SVG. The calling array must contain a single element &mdas
 
   * Each of `r`, `c`, `p` is a tag name or an array of tag names whose number of entries is equal to the length of the dimension of `x` being encoded.
   
-  * `i` is a single tag name &mdash; i.e. the same tag name is used for all inner arrays. (Note: if an entry of `x` is not an array, it is encoded as a single element).
+  * `i` is a single tag name &mdash; i.e. the same tag name is used for all inner arrays.
   
   * Omit any of `r`, `c`, `p`, `i` (or pass a falsy value) to skip the corresponding dimension.
 
@@ -130,7 +130,7 @@ Notes:
 
   `ps` and `spans` are 3-entry vectors of `<p>` and `<span>` elements respectively.
 
-* If inner arrays are encoded, the inner arrays of the result will match those of the calling array &mdash; i.e. if cubes, they will have the same shape, keys and labels.
+* If inner arrays are encoded, the inner arrays of the result will match those of `x` &mdash; i.e. if cubes, they will have the same shape, keys and labels. (Note: if an 'inner array' of `x` is not an array, it is encoded as a single element).
 
 ---
 
