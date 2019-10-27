@@ -11,6 +11,8 @@
       
   Object.defineProperty( Event.prototype, 'me', {
     get() {return [this.target]},
+    configurable: true,
+    enumerable: false
   });
   
   
