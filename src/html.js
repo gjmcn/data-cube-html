@@ -9,9 +9,6 @@
   const createElmHTML = tag => document.createElement(tag);
   const createElmSVG  = tag => document.createElementNS("http://www.w3.org/2000/svg", tag);
       
-  if ('me' in Event.prototype) {
-    throw Error(name + ' is already a property of Event.protoype');      
-  }
   Object.defineProperty( Event.prototype, 'me', {
     get() {return [this.target]},
   });
